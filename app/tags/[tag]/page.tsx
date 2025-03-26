@@ -57,5 +57,3 @@ export default async function TagPage(props: { params: Promise<{ tag: string }> 
     />
   )
 }
-
-export const runtime = 'edge'
