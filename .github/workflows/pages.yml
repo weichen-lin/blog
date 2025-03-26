@@ -21,5 +21,4 @@ jobs:
           CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
         run: |
           pnpm install
-          pnpm run pages:build
           pnpm run deploy
