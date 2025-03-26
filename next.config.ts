@@ -1,6 +1,13 @@
-const { withContentlayer } = require('next-contentlayer2')
+import { NextConfig } from 'next'
+import { withContentlayer } from 'next-contentlayer2'
+import withBundleAnalyzer from '@next/bundle-analyzer'
+import { setupDevPlatform } from '@cloudflare/next-on-pages/next-dev'
 
-const withBundleAnalyzer = require('@next/bundle-analyzer')({
+if (process.env.NODE_ENV === 'development') {
+  setupDevPlatform()
+}
+
+const withBundleAnalyzerEnhanced = withBundleAnalyzer({
   enabled: process.env.ANALYZE === 'true',
 })
 
@@ -52,49 +59,45 @@ const securityHeaders = [
     key: 'Permissions-Policy',
     value: 'camera=(), microphone=(), geolocation=()',
   },
-]
+] as const
 
-const output = process.env.EXPORT ? 'export' : undefined
-const basePath = process.env.BASE_PATH || undefined
-const unoptimized = process.env.UNOPTIMIZED ? true : undefined
+const output: NextConfig['output'] = process.env.EXPORT === 'true' ? 'export' : undefined
+const basePath: NextConfig['basePath'] = process.env.BASE_PATH
 
-/**
- * @type {import('next/dist/next-server/server/config').NextConfig}
- **/
-module.exports = () => {
-  const plugins = [withContentlayer, withBundleAnalyzer]
-  return plugins.reduce((acc, next) => next(acc), {
-    output,
-    basePath,
-    reactStrictMode: true,
-    pageExtensions: ['ts', 'tsx', 'js', 'jsx', 'md', 'mdx'],
-    eslint: {
-      dirs: ['app', 'components', 'layouts', 'scripts'],
-    },
-    images: {
-      remotePatterns: [
-        {
-          protocol: 'https',
-          hostname: 'picsum.photos',
-        },
-      ],
-      unoptimized,
-    },
-    async headers() {
-      return [
-        {
-          source: '/(.*)',
-          headers: securityHeaders,
-        },
-      ]
-    },
-    webpack: (config, options) => {
-      config.module.rules.push({
-        test: /\.svg$/,
-        use: ['@svgr/webpack'],
-      })
+const config: NextConfig = {
+  output,
+  basePath,
+  reactStrictMode: true,
+  pageExtensions: ['ts', 'tsx', 'js', 'jsx', 'md', 'mdx'],
+  eslint: {
+    dirs: ['app', 'components', 'layouts', 'scripts'],
+  },
+  images: {
+    remotePatterns: [
+      {
+        protocol: 'https',
+        hostname: 'picsum.photos',
+      },
+    ],
+  },
+  // async headers() {
+  //   return [
+  //     {
+  //       source: '/(.*)',
+  //       headers: securityHeaders,
+  //     },
+  //   ]
+  // },
+  webpack: (config) => {
+    config.module?.rules?.push({
+      test: /\.svg$/,
+      use: ['@svgr/webpack'],
+    })
 
-      return config
-    },
-  })
+    return config
+  },
 }
+
+const plugins = [withContentlayer, withBundleAnalyzerEnhanced]
+
+export default plugins.reduce((acc, next) => next(acc), config)
