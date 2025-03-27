@@ -1,15 +1,10 @@
-import { NextConfig } from 'next'
-import { withContentlayer } from 'next-contentlayer2'
-import withBundleAnalyzer from '@next/bundle-analyzer'
-import { setupDevPlatform } from '@cloudflare/next-on-pages/next-dev'
-
-if (process.env.NODE_ENV === 'development') {
-  setupDevPlatform()
-}
+import withBundleAnalyzer from '@next/bundle-analyzer';
+import type { NextConfig } from 'next';
+import { withContentlayer } from 'next-contentlayer2';
 
 const withBundleAnalyzerEnhanced = withBundleAnalyzer({
   enabled: process.env.ANALYZE === 'true',
-})
+});
 
 // You might need to insert additional domains in script-src if you are using external services
 const ContentSecurityPolicy = `
@@ -21,7 +16,7 @@ const ContentSecurityPolicy = `
   connect-src *;
   font-src 'self';
   frame-src giscus.app
-`
+`;
 
 const securityHeaders = [
   // https://developer.mozilla.org/en-US/docs/Web/HTTP/CSP
@@ -59,19 +54,17 @@ const securityHeaders = [
     key: 'Permissions-Policy',
     value: 'camera=(), microphone=(), geolocation=()',
   },
-] as const
+] as const;
 
-const output: NextConfig['output'] = process.env.EXPORT === 'true' ? 'export' : undefined
-const basePath: NextConfig['basePath'] = process.env.BASE_PATH
+const output: NextConfig['output'] =
+  process.env.EXPORT === 'true' ? 'export' : undefined;
+const basePath: NextConfig['basePath'] = process.env.BASE_PATH;
 
 const config: NextConfig = {
   output,
   basePath,
   reactStrictMode: true,
   pageExtensions: ['ts', 'tsx', 'js', 'jsx', 'md', 'mdx'],
-  eslint: {
-    dirs: ['app', 'components', 'layouts', 'scripts'],
-  },
   images: {
     remotePatterns: [
       {
@@ -92,12 +85,12 @@ const config: NextConfig = {
     config.module?.rules?.push({
       test: /\.svg$/,
       use: ['@svgr/webpack'],
-    })
+    });
 
-    return config
+    return config;
   },
-}
+};
 
-const plugins = [withContentlayer, withBundleAnalyzerEnhanced]
+const plugins = [withContentlayer, withBundleAnalyzerEnhanced];
 
-export default plugins.reduce((acc, next) => next(acc), config)
+export default plugins.reduce((acc, next) => next(acc), config);
