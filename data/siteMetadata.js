@@ -1,6 +1,6 @@
 /** @type {import("pliny/config").PlinyConfig } */
 const siteMetadata = {
-  title: 'WeiChen Lin',
+  title: 'Blog',
   author: 'WeiChen Lin',
   headerTitle: 'WeiChen Lin.',
   description: 'A blog created with Next.js and Tailwind.css',
@@ -98,6 +98,6 @@ const siteMetadata = {
     //   indexName: 'docsearch',
     // },
   },
-}
+};
 
-module.exports = siteMetadata
+module.exports = siteMetadata;

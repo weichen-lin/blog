@@ -1,0 +1,86 @@
+---
+title: 不連結 git部署 Vercel：使用 CLI 指南
+date: '2025-03-28'
+tags: ['vercel', 'next.js']
+draft: false
+summary: 本文介紹如何使用 Vercel 命令行介面 (CLI) 在不連結 Git 儲存庫的情況下，將 Next.js 專案部署到 Vercel 平台，包括安裝 CLI、創建專案、部署以及本地建置後部署的方法。
+---
+
+## 在 Vercel 建立專案
+
+![vercel-create-project](/static/images/deploy-without-git-vecel/vercel-create-project.png)
+
+目前在 Vercel 的使用者介面 (UI) 上建立新的專案，只能透過連結現有的 Git 儲存庫或選擇 Fork 一個範本來完成部署。但因為個人不希望授權其他平台整合我的 GitHub，所以想嘗試是否能在不綁定 Git 的情況下進行部署。
+
+經過研究，我發現有一個相當好用的 CLI 工具可以達成這個目的。
+
+## VERCEL CLI
+
+1. 下載 Vercel CLI
+
+```bash
+pnpm i -g vercel
+```
+
+2. 使用 CLI 登入 Vercel
+
+```bash
+pnpm vercel login
+```
+
+![vercel-login](/static/images/deploy-without-git-vecel/vercel-login.png)
+
+3. 直接執行 `vercel deploy`
+
+```bash
+pnpm vercel deploy
+```
+
+這時候 CLI 會詢問你是否要連結到已存在的專案，記得選擇「否」（或拒絕）。
+
+![vercel-deploy](/static/images/deploy-without-git-vecel/vercel-deploy.png)
+
+完成後，你會在 Vercel 的儀表板 UI 上看到一個新的專案已經部署完成。
+
+4. 取得 Vercel 的 `Organization Id` 和 `Project Id`
+
+部署完成後，你可以在專案當前的 `.vercel` 資料夾內找到你的 Organization Id 和 Project Id。記得將 `.vercel` 加入到 `.gitignore` 檔案中，避免將這些資訊提交上去。
+
+5. CI/CD 整合
+
+從上一步驟取得的 Organization Id 和 Project Id，再加上你的 Vercel API Token，就可以直接進行自動化部署了。
+
+以下提供一份 GitHub Actions 的範本：
+
+```yaml
+name: Deploy Production on Vercel
+env:
+  VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+  VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  Deploy-Production:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Install Vercel CLI
+        run: npm install -g vercel pnpm
+
+      - name: Pull Vercel Environment Information
+        run: vercel pull --yes --environment=production --token=${{ secrets.VERCEL_TOKEN }}
+
+      - name: Build Project Artifacts
+        run: |
+          vercel build --token=${{ secrets.VERCEL_TOKEN }}
+
+      - name: Deploy Project Artifacts to Vercel
+        run: vercel deploy --prod --token=${{ secrets.VERCEL_TOKEN }}
+```
+
+Vercel Token 可以從你的帳戶設定 (Account Setting) 中的 Token 頁面自行建立。
