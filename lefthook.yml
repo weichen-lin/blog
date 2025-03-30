@@ -3,6 +3,6 @@ pre-commit:
   jobs:
     - name: biome check
       run: |
-        pnpm @biomejs/biome check --write {staged_files}
+        pnpm biome check --write {staged_files}
         git add {staged_files}
       glob: '*.{js,ts,jsx,tsx}'

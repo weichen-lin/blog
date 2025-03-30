@@ -1,45 +1,36 @@
-'use client';
+'use client'
 
-import NumberTicker from '@/components/ui/number-ticker';
-import useContributions from './useContributions';
+import NumberTicker from '@/components/ui/number-ticker'
+import useContributions from './useContributions'
 
-import { OverviewSkeleton } from './Skeleton';
+import { OverviewSkeleton } from './Skeleton'
 
 const Overview = () => {
-  const { isLoading, data } = useContributions();
+  const { isLoading, data } = useContributions()
 
   if (isLoading) {
-    return <OverviewSkeleton />;
+    return <OverviewSkeleton />
   }
 
   if (!data) {
-    return null;
+    return null
   }
 
-  const contributionCalendar =
-    data?.contributionsCollection?.contributionCalendar;
-  const weeks = contributionCalendar?.weeks;
-  const totalContributions = contributionCalendar?.totalContributions;
+  const contributionCalendar = data?.contributionsCollection?.contributionCalendar
+  const weeks = contributionCalendar?.weeks
+  const totalContributions = contributionCalendar?.totalContributions
 
   const totalThisWeekContribution =
     weeks?.[weeks?.length - 1]?.contributionDays
       ?.map((item) => item.contributionCount)
-      ?.reduce(
-        (previousValue, currentValue) => previousValue + currentValue,
-        0
-      ) ?? 0;
+      ?.reduce((previousValue, currentValue) => previousValue + currentValue, 0) ?? 0
 
-  const totalContributionList = weeks
-    ?.map((week) =>
-      week.contributionDays.map(
-        (contributionDay) => contributionDay.contributionCount
-      )
-    )
-    .flat(1);
+  const totalContributionList = weeks?.flatMap((week) =>
+    week.contributionDays.map((contributionDay) => contributionDay.contributionCount)
+  )
 
-  const bestContribution = Math.max(...totalContributionList);
-  const averageContribution =
-    (totalContributions || 0) / totalContributionList.length;
+  const bestContribution = Math.max(...totalContributionList)
+  const averageContribution = (totalContributions || 0) / totalContributionList.length
 
   const overviews = [
     {
@@ -58,7 +49,7 @@ const Overview = () => {
       title: 'Daily Average',
       value: averageContribution ?? 0,
     },
-  ];
+  ]
 
   return (
     <div className='grid grid-cols-2 gap-2 py-2 md:grid-cols-4'>
@@ -75,7 +66,7 @@ const Overview = () => {
         </div>
       ))}
     </div>
-  );
-};
+  )
+}
 
-export default Overview;
+export default Overview

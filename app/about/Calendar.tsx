@@ -1,39 +1,37 @@
-'use client';
+'use client'
 
-import { useState } from 'react';
-import { cn } from '@/lib/utils';
-import { motion } from 'motion/react';
+import { cn } from '@/lib/utils'
+import { motion } from 'motion/react'
+import { useState } from 'react'
 
-import useContributions from './useContributions';
-import { CalendarSkeleton } from './Skeleton';
+import { CalendarSkeleton } from './Skeleton'
+import useContributions from './useContributions'
 type selectContributionType = {
-  count: number | null;
-  date: string | null;
-};
+  count: number | null
+  date: string | null
+}
 
 const Calendar = () => {
-  const { data, isLoading } = useContributions();
+  const { data, isLoading } = useContributions()
 
-  const [selectContribution, setSelectContribution] =
-    useState<selectContributionType>({
-      count: null,
-      date: null,
-    });
+  const [selectContribution, setSelectContribution] = useState<selectContributionType>({
+    count: null,
+    date: null,
+  })
 
   if (isLoading) {
-    return <CalendarSkeleton />;
+    return <CalendarSkeleton />
   }
 
-  const contributionCalendar =
-    data?.contributionsCollection?.contributionCalendar;
-  const colors = contributionCalendar?.colors;
-  const weeks = contributionCalendar?.weeks;
-  const months = contributionCalendar?.months;
+  const contributionCalendar = data?.contributionsCollection?.contributionCalendar
+  const colors = contributionCalendar?.colors
+  const weeks = contributionCalendar?.weeks
+  const months = contributionCalendar?.months
 
   const handleSelectContribution = (data: selectContributionType) => {
-    const { count, date } = data;
-    setSelectContribution({ count, date });
-  };
+    const { count, date } = data
+    setSelectContribution({ count, date })
+  }
 
   return (
     <>
@@ -43,12 +41,9 @@ const Calendar = () => {
             <div key={week.firstDay}>
               {week.contributionDays.map((contribution) => {
                 const backgroundColor =
-                  contribution.contributionCount > 0
-                    ? (contribution?.color as string)
-                    : '';
+                  contribution.contributionCount > 0 ? (contribution?.color as string) : ''
 
-                const getRandomDelayAnimate =
-                  Math.random() * week.contributionDays.length * 0.15;
+                const getRandomDelayAnimate = Math.random() * week.contributionDays.length * 0.15
 
                 return (
                   <motion.span
@@ -74,7 +69,7 @@ const Calendar = () => {
                       })
                     }
                   />
-                );
+                )
               })}
             </div>
           ))}
@@ -112,7 +107,7 @@ const Calendar = () => {
         </div>
       </div>
     </>
-  );
-};
+  )
+}
 
-export default Calendar;
+export default Calendar

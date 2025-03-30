@@ -1,19 +1,19 @@
-import { useQuery } from '@tanstack/react-query';
+import { useQuery } from '@tanstack/react-query'
 
-const API_PATH = '/api/github/contribution';
+const API_PATH = '/api/github/contribution'
 
 const useContributions = () => {
   const query = useQuery({
     queryKey: [API_PATH],
     queryFn: async () => {
-      const response = await fetch(API_PATH, { method: 'GET' });
+      const response = await fetch(API_PATH, { method: 'GET' })
 
-      return response.json();
+      return response.json()
     },
     refetchOnWindowFocus: false,
-  });
+  })
 
-  return query;
-};
+  return query
+}
 
-export default useContributions;
+export default useContributions

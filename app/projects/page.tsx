@@ -1,9 +1,9 @@
-import Card from '@/components/Card';
-import projectsData from '@/data/projectsData';
-import { genPageMetadata } from 'app/seo';
-import PageLayout from '@/layouts/PageLayout';
+import Card from '@/components/Card'
+import projectsData from '@/data/projectsData'
+import PageLayout from '@/layouts/PageLayout'
+import { genPageMetadata } from 'app/seo'
 
-export const metadata = genPageMetadata({ title: 'Projects' });
+export const metadata = genPageMetadata({ title: 'Projects' })
 
 export default function Projects() {
   return (
@@ -32,5 +32,5 @@ export default function Projects() {
         </div>
       </div>
     </PageLayout>
-  );
+  )
 }

@@ -1,9 +1,9 @@
-import type { ReactNode } from 'react';
+import type { ReactNode } from 'react'
 
 interface Props {
-  children: ReactNode;
+  children: ReactNode
 }
 
 export default function SectionContainer({ children }: Props) {
-  return <section>{children}</section>;
+  return <section>{children}</section>
 }

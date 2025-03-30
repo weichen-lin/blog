@@ -1,43 +1,37 @@
-import Comments from '@/components/Comments';
-import Image from '@/components/Image';
-import Link from '@/components/Link';
-import PageTitle from '@/components/PageTitle';
-import ScrollTopAndComment from '@/components/ScrollTopAndComment';
-import SectionContainer from '@/components/SectionContainer';
-import Tag from '@/components/Tag';
-import siteMetadata from '@/data/siteMetadata';
-import type { Authors, Blog } from 'contentlayer/generated';
-import type { CoreContent } from 'pliny/utils/contentlayer';
-import type { ReactNode } from 'react';
+import Comments from '@/components/Comments'
+import Image from '@/components/Image'
+import Link from '@/components/Link'
+import PageTitle from '@/components/PageTitle'
+import ScrollTopAndComment from '@/components/ScrollTopAndComment'
+import SectionContainer from '@/components/SectionContainer'
+import Tag from '@/components/Tag'
+import siteMetadata from '@/data/siteMetadata'
+import type { Authors, Blog } from 'contentlayer/generated'
+import type { CoreContent } from 'pliny/utils/contentlayer'
+import type { ReactNode } from 'react'
 
-const editUrl = (path) => `${siteMetadata.siteRepo}/blob/main/data/${path}`;
+const editUrl = (path) => `${siteMetadata.siteRepo}/blob/main/data/${path}`
 const discussUrl = (path) =>
-  `https://mobile.twitter.com/search?q=${encodeURIComponent(`${siteMetadata.siteUrl}/${path}`)}`;
+  `https://mobile.twitter.com/search?q=${encodeURIComponent(`${siteMetadata.siteUrl}/${path}`)}`
 
 const postDateTemplate: Intl.DateTimeFormatOptions = {
   weekday: 'long',
   year: 'numeric',
   month: 'long',
   day: 'numeric',
-};
-
-interface LayoutProps {
-  content: CoreContent<Blog>;
-  authorDetails: CoreContent<Authors>[];
-  next?: { path: string; title: string };
-  prev?: { path: string; title: string };
-  children: ReactNode;
 }
 
-export default function PostLayout({
-  content,
-  authorDetails,
-  next,
-  prev,
-  children,
-}: LayoutProps) {
-  const { filePath, path, slug, date, title, tags } = content;
-  const basePath = path.split('/')[0];
+interface LayoutProps {
+  content: CoreContent<Blog>
+  authorDetails: CoreContent<Authors>[]
+  next?: { path: string; title: string }
+  prev?: { path: string; title: string }
+  children: ReactNode
+}
+
+export default function PostLayout({ content, authorDetails, next, prev, children }: LayoutProps) {
+  const { filePath, path, slug, date, title, tags } = content
+  const basePath = path.split('/')[0]
 
   return (
     <SectionContainer>
@@ -51,10 +45,7 @@ export default function PostLayout({
                   <dt className='sr-only'>Published on</dt>
                   <dd className='text-base leading-6 font-medium text-gray-500 dark:text-gray-400'>
                     <time dateTime={date}>
-                      {new Date(date).toLocaleDateString(
-                        siteMetadata.locale,
-                        postDateTemplate
-                      )}
+                      {new Date(date).toLocaleDateString(siteMetadata.locale, postDateTemplate)}
                     </time>
                   </dd>
                 </div>
@@ -70,10 +61,7 @@ export default function PostLayout({
               <dd>
                 <ul className='flex flex-wrap justify-center gap-4 sm:space-x-12 xl:block xl:space-y-8 xl:space-x-0'>
                   {authorDetails.map((author) => (
-                    <li
-                      className='flex items-center space-x-2'
-                      key={author.name}
-                    >
+                    <li className='flex items-center space-x-2' key={author.name}>
                       {author.avatar && (
                         <Image
                           src={author.avatar}
@@ -85,9 +73,7 @@ export default function PostLayout({
                       )}
                       <dl className='text-sm leading-5 font-medium whitespace-nowrap'>
                         <dt className='sr-only'>Name</dt>
-                        <dd className='text-gray-900 dark:text-gray-100'>
-                          {author.name}
-                        </dd>
+                        <dd className='text-gray-900 dark:text-gray-100'>{author.name}</dd>
                         <dt className='sr-only'>Twitter</dt>
                         <dd>
                           {author.twitter && (
@@ -108,9 +94,7 @@ export default function PostLayout({
               </dd>
             </dl>
             <div className='divide-y divide-gray-200 xl:col-span-3 xl:row-span-2 xl:pb-0 dark:divide-gray-700'>
-              <div className='prose dark:prose-invert max-w-none pt-10 pb-8'>
-                {children}
-              </div>
+              <div className='prose dark:prose-invert max-w-none pt-10 pb-8'>{children}</div>
               {/* {siteMetadata.comments && (
                 <div
                   className='pt-6 pb-6 text-center text-gray-700 dark:text-gray-300'
@@ -173,5 +157,5 @@ export default function PostLayout({
         </div>
       </article>
     </SectionContainer>
-  );
+  )
 }

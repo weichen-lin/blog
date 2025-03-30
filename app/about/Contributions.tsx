@@ -1,5 +1,5 @@
-import Overview from './Overview';
-import Calendar from './Calendar';
+import Calendar from './Calendar'
+import Overview from './Overview'
 
 const Contributions = () => {
   return (
@@ -11,7 +11,7 @@ const Contributions = () => {
       <Overview />
       <Calendar />
     </div>
-  );
-};
+  )
+}
 
-export default Contributions;
+export default Contributions

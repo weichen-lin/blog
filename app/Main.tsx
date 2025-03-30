@@ -1,8 +1,8 @@
-import Footer from '@/components/Footer';
-import Header from '@/components/Header';
-import { BackgroundBeamsWithCollision } from '@/components/ui/background-beams-with-collision';
-import { BoxReveal } from '@/components/magicui/box-reveal';
-import Image from '@/components/Image';
+import Footer from '@/components/Footer'
+import Header from '@/components/Header'
+import Image from '@/components/Image'
+import { BoxReveal } from '@/components/magicui/box-reveal'
+import { BackgroundBeamsWithCollision } from '@/components/ui/background-beams-with-collision'
 
 export default function Home() {
   return (
@@ -28,16 +28,11 @@ export default function Home() {
         <BoxReveal boxColor={'#5046e6'} duration={0.5}>
           <div className='flex items-center gap-x-4'>
             <h2 className='mt-[.5rem] text-[1rem]'>目前任職於</h2>
-            <Image
-              src='/static/images/91app.png'
-              width={100}
-              height={50}
-              alt='91APP'
-            />
+            <Image src='/static/images/91app.png' width={100} height={50} alt='91APP' />
           </div>
         </BoxReveal>
       </div>
       <Footer />
     </BackgroundBeamsWithCollision>
-  );
+  )
 }
