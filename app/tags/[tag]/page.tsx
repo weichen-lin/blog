@@ -6,6 +6,7 @@ import { allBlogs } from 'contentlayer/generated';
 import { slug } from 'github-slugger';
 import type { Metadata } from 'next';
 import { allCoreContent, sortPosts } from 'pliny/utils/contentlayer';
+import PageLayout from '@/layouts/PageLayout';
 
 const POSTS_PER_PAGE = 5;
 
@@ -47,11 +48,13 @@ export default async function TagPage(props: {
   };
 
   return (
-    <ListLayout
-      posts={filteredPosts}
-      initialDisplayPosts={initialDisplayPosts}
-      pagination={pagination}
-      title={title}
-    />
+    <PageLayout>
+      <ListLayout
+        posts={filteredPosts}
+        initialDisplayPosts={initialDisplayPosts}
+        pagination={pagination}
+        title={title}
+      />
+    </PageLayout>
   );
 }

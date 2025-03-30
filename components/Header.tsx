@@ -1,20 +1,21 @@
-import headerNavLinks from '@/data/headerNavLinks'
-import logo from '@/data/left-logo.png'
-import Logo from '@/data/logo.svg'
-import siteMetadata from '@/data/siteMetadata'
-import Link from './Link'
-import MobileNav from './MobileNav'
-import SearchButton from './SearchButton'
-import ThemeSwitch from './ThemeSwitch'
+import headerNavLinks from '@/data/headerNavLinks';
+import logo from '@/data/left-logo.png';
+import Logo from '@/data/logo.svg';
+import siteMetadata from '@/data/siteMetadata';
+import Link from './Link';
+import MobileNav from './MobileNav';
+import SearchButton from './SearchButton';
+import ThemeSwitch from './ThemeSwitch';
+import { cn } from '@/lib/utils';
 
 const Header = () => {
-  let headerClass = 'flex items-center w-full bg-white dark:bg-gray-950 justify-between py-10'
-  if (siteMetadata.stickyNav) {
-    headerClass += ' sticky top-0 z-50'
-  }
-
   return (
-    <header className={headerClass}>
+    <header
+      className={cn(
+        'flex items-center w-full justify-between py-10 mx-auto max-w-3xl px-4 sm:px-6 xl:max-w-5xl xl:px-0 bg-transparent',
+        siteMetadata.stickyNav && 'sticky top-0 z-50'
+      )}
+    >
       <Link href='/' aria-label={siteMetadata.headerTitle}>
         <div className='flex items-center justify-between'>
           <div className='mr-3'>
@@ -48,7 +49,7 @@ const Header = () => {
         <MobileNav />
       </div>
     </header>
-  )
-}
+  );
+};
 
-export default Header
+export default Header;

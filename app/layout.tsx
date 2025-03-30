@@ -2,8 +2,6 @@ import 'css/tailwind.css';
 import 'pliny/search/algolia.css';
 import 'remark-github-blockquote-alert/alert.css';
 
-import Footer from '@/components/Footer';
-import Header from '@/components/Header';
 import SectionContainer from '@/components/SectionContainer';
 import siteMetadata from '@/data/siteMetadata';
 import type { Metadata } from 'next';
@@ -114,7 +112,7 @@ export default function RootLayout({
         type='application/rss+xml'
         href={`${basePath}/feed.xml`}
       />
-      <body className='bg-white pl-[calc(100vw-100%)] text-black antialiased dark:bg-gray-950 dark:text-white'>
+      <body className='bg-white pl-[calc(100vw-100%)] text-black antialiased dark:bg-neutral-950 dark:text-white'>
         <TanstackProvider>
           <ThemeProviders>
             <Analytics
@@ -124,10 +122,8 @@ export default function RootLayout({
               <SearchProvider
                 searchConfig={siteMetadata.search as SearchConfig}
               >
-                <Header />
-                <main className='mb-auto'>{children}</main>
+                <main>{children}</main>
               </SearchProvider>
-              <Footer />
             </SectionContainer>
           </ThemeProviders>
         </TanstackProvider>

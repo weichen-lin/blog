@@ -1,14 +1,19 @@
-import siteMetadata from '@/data/siteMetadata'
-import type { Metadata } from 'next'
+import siteMetadata from '@/data/siteMetadata';
+import type { Metadata } from 'next';
 
 interface PageSEOProps {
-  title: string
-  description?: string
-  image?: string
-  [key: string]: string | undefined
+  title: string;
+  description?: string;
+  image?: string;
+  [key: string]: string | undefined;
 }
 
-export function genPageMetadata({ title, description, image, ...rest }: PageSEOProps): Metadata {
+export function genPageMetadata({
+  title,
+  description,
+  image,
+  ...rest
+}: PageSEOProps): Metadata {
   return {
     title,
     description: description || siteMetadata.description,
@@ -27,5 +32,5 @@ export function genPageMetadata({ title, description, image, ...rest }: PageSEOP
       images: image ? [image] : [siteMetadata.socialBanner],
     },
     ...rest,
-  }
+  };
 }
