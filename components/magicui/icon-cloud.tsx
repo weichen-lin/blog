@@ -146,8 +146,8 @@ export function IconCloud({ icons, images }: IconCloudProps) {
       const rotatedZ = icon.x * sinY + icon.z * cosY
       const rotatedY = icon.y * cosX + rotatedZ * sinX
 
-      const screenX = canvasRef.current?.width / 2 + rotatedX
-      const screenY = canvasRef.current?.height / 2 + rotatedY
+      const screenX = canvasRef.current?.width ?? 0 / 2 + rotatedX
+      const screenY = canvasRef.current?.height ?? 0 / 2 + rotatedY
 
       const scale = (rotatedZ + 200) / 300
       const radius = 20 * scale
