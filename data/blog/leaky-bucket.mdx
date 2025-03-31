@@ -1,0 +1,155 @@
+---
+title: 速率桶演算法：原理、應用與實作
+date: '2025-03-31'
+tags: ['rate limiting', 'system design', 'backend development', 'algorithm']
+draft: false
+summary: 本文將簡單探討速率桶演算法的原理，解釋其如何實現流量限制和整形，並提供程式碼實作範例（TypeScript）。
+---
+
+最近在工作上遇到一個情境，就是會有突然爆量的大量請求湧進來，但我們希望這些請求能以比較穩定的速度寫入資料庫。
+
+那時候研究了一些演算法，就發現這個叫做 Leaky Bucket (速率桶) 的東西，還蠻符合我們當時的需求的。
+
+![leaky-bucket](/static/images/leaky-bucket.png)
+
+它的核心想法其實很簡單，你可以把它想像成這樣：
+
+1. 我們把每一個進來的請求都當作是一滴水，然後想像有一個固定大小的桶子。
+2. 這些「水滴」可以以任何速度流進這個桶子裡。
+3. 但是呢，這個桶子的底部有一個小洞，會以固定的速度把水滴漏出去。
+4. 重點來了，如果桶子裡的水滿了，新的水滴就會被我們直接丟掉或是拒絕掉 -> 當然你也可以設計成桶子永遠不會滿，就只是排隊的概念。
+
+以 typescript 來舉例。
+
+```typescript
+class LeakyBucket<T = any> {
+  private _processInterval: number; // 每次處理的間隔時間 (可以想像成漏水的速度)
+  private _batchSize: number; // 一次要處理多少筆資料
+  private _minBatchSize: number; // 至少要累積到多少筆才處理
+  private _processDataCallback: (data: T[]) => Promise<void> | void; // 處理資料的 function，支援非同步喔
+  private _dataBuffer: T[]; // 這個就是我們的「水桶」，用來裝還沒處理的資料
+  private _intervalId: ReturnType<typeof setInterval> | null = null; // 定時器的 ID
+  private _processing: boolean = false; // 記錄現在是不是正在處理中
+  private _maxBatchesPerInterval: number; // 在一個間隔時間內，最多可以處理幾批資料
+
+  constructor({
+    processInterval = 200, // 預設 200 毫秒處理一次
+    batchSize = 50, // 預設一次處理 50 筆
+    minBatchSize = 0, // 預設沒有最小限制
+    maxBatchesPerInterval = 1, // 預設每次間隔只處理一批
+    processDataCallback, // 這是處理資料的 callback function，一定要傳進來
+  }: {
+    processInterval?: number;
+    batchSize?: number;
+    minBatchSize?: number;
+    maxBatchesPerInterval?: number;
+    processDataCallback: (data: T[]) => Promise<void> | void;
+  }) {
+    this._processInterval = processInterval;
+    this._batchSize = batchSize;
+    this._minBatchSize = minBatchSize;
+    this._maxBatchesPerInterval = maxBatchesPerInterval;
+    this._processDataCallback = processDataCallback;
+    this._dataBuffer = []; // 一開始水桶是空的
+  }
+
+  receiveData(data: T): void {
+    // 收到一筆資料，就把它丟進水桶裡
+    this._dataBuffer.push(data);
+  }
+
+  receiveBatch(data: T[]): void {
+    // 收到一批資料，就全部倒進水桶
+    this._dataBuffer.push(...data);
+  }
+
+  startProcessing(): void {
+    // 開始讓水桶以固定的速度漏水 (處理資料)
+    if (this._intervalId) return; // 如果已經開始了就不要再啟動了
+
+    this._intervalId = setInterval(async () => {
+      if (this._processing) {
+        // logger.debug('Processing in progress, skipping this interval');
+        return; // 上一次還沒處理完就跳過這次
+      }
+
+      try {
+        this._processing = true; // 標記為正在處理中
+        // 處理多個批次
+
+        let batchesProcessed = 0; // 只要水桶裡的資料夠我們一次處理的量，而且還沒達到這次間隔的處理上限
+
+        while (
+          this._dataBuffer.length >= this._batchSize &&
+          batchesProcessed < this._maxBatchesPerInterval
+        ) {
+          // 從水桶裡拿出固定量的資料
+          const batch = this._dataBuffer.splice(0, this._batchSize); // 處理這一批資料
+          await this._processBatch(batch);
+          batchesProcessed++; // 紀錄處理了多少批
+        } // 處理剩下但數量又達到最小批次的資料
+
+        if (
+          this._dataBuffer.length >= this._minBatchSize &&
+          this._dataBuffer.length < this._batchSize &&
+          batchesProcessed < this._maxBatchesPerInterval
+        ) {
+          // 把剩下的資料全部拿出來處理
+          const batch = [...this._dataBuffer];
+          this._dataBuffer = []; // 清空水桶
+          await this._processBatch(batch);
+        }
+      } catch (error) {
+        console.error('處理資料的時候出錯啦：', error);
+      } finally {
+        this._processing = false; // 處理完畢，可以開始下一次的處理
+      }
+    }, this._processInterval); // 設定多久處理一次
+  }
+
+  private async _processBatch(batch: T[]): Promise<void> {
+    try {
+      // 真正處理資料的地方，呼叫我們傳進來的 callback function
+      await this._processDataCallback(batch);
+    } catch (error) {
+      console.error('在處理資料的回呼函式裡出錯了：', error); // 你可以選擇要把處理失敗的資料重新放回水桶，或是直接丟掉
+      // this._dataBuffer.unshift(...batch);
+    }
+  }
+
+  stopProcessing(): void {
+    // 停止漏水 (停止處理資料)
+    if (!this._intervalId) return;
+
+    clearInterval(this._intervalId); // 清掉定時器
+    this._intervalId = null; // 停止之後，把水桶裡剩下的水也處理掉
+
+    this._processRemainingData();
+  }
+
+  private async _processRemainingData(): Promise<void> {
+    // 處理水桶裡剩下的資料
+    if (this._dataBuffer.length > 0) {
+      try {
+        this._processing = true;
+        await this._processDataCallback([...this._dataBuffer]);
+        this._dataBuffer = []; // 清空水桶
+      } catch (error) {
+        console.error('處理剩下的資料時出錯了：', error);
+      } finally {
+        this._processing = false;
+      }
+    }
+  }
+
+  get bufferSize(): number {
+    // 看看水桶裡還有多少資料
+    return this._dataBuffer.length;
+  }
+
+  get isProcessing(): boolean {
+    // 現在是不是正在處理中
+    return this._intervalId !== null;
+  }
+}
+```

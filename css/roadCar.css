@@ -20,6 +20,24 @@
   animation: road_animate 0.1125s infinite;
 }
 
+.light .road::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  width: 100%;
+  height: 4px;
+  background: linear-gradient(
+    90deg,
+    #484747,
+    #484747 50%,
+    transparent 50%,
+    transparent 100%
+  );
+  background-size: 50px;
+  transform: rotate(-10deg);
+  animation: road_animate 0.1125s infinite;
+}
+
 @keyframes road_animate {
   0% {
     background-position: 50px 0;
