@@ -26,6 +26,12 @@ importers:
       '@tanstack/react-query':
         specifier: ^5.69.0
         version: 5.69.0(react@19.0.0)
+      '@types/lodash':
+        specifier: ^4.17.16
+        version: 4.17.16
+      '@types/matter-js':
+        specifier: ^0.19.8
+        version: 0.19.8
       body-scroll-lock:
         specifier: ^4.0.0-beta.0
         version: 4.0.0-beta.0
@@ -53,9 +59,15 @@ importers:
       image-size:
         specifier: 1.0.0
         version: 1.0.0
+      lodash:
+        specifier: ^4.17.21
+        version: 4.17.21
       lucide-react:
         specifier: ^0.484.0
         version: 0.484.0(react@19.0.0)
+      matter-js:
+        specifier: ^0.20.0
+        version: 0.20.0
       motion:
         specifier: ^12.6.2
         version: 12.6.2(react-dom@19.0.0(react@19.0.0))(react@19.0.0)
@@ -71,6 +83,9 @@ importers:
       pliny:
         specifier: 0.4.1
         version: 0.4.1(@algolia/client-search@5.23.0)(@types/react@19.0.12)(acorn@8.14.1)(esbuild@0.20.2)(next@15.1.4(@babel/core@7.26.10)(@opentelemetry/api@1.9.0)(react-dom@19.0.0(react@19.0.0))(react@19.0.0))(react-dom@19.0.0(react@19.0.0))(react@19.0.0)(search-insights@2.17.3)
+      poly-decomp:
+        specifier: ^0.3.0
+        version: 0.3.0
       postcss:
         specifier: ^8.4.24
         version: 8.5.3
@@ -83,6 +98,9 @@ importers:
       react-dom:
         specifier: 19.0.0
         version: 19.0.0(react@19.0.0)
+      react-icons:
+        specifier: ^5.5.0
+        version: 5.5.0(react@19.0.0)
       reading-time:
         specifier: 1.5.0
         version: 1.5.0
@@ -119,6 +137,9 @@ importers:
       remark-math:
         specifier: ^6.0.0
         version: 6.0.0
+      svg-path-commander:
+        specifier: ^2.1.10
+        version: 2.1.10
       tailwind-merge:
         specifier: ^3.0.2
         version: 3.0.2
@@ -131,6 +152,9 @@ importers:
       unist-util-visit:
         specifier: ^5.0.0
         version: 5.0.0
+      zustand:
+        specifier: ^5.0.3
+        version: 5.0.3(@types/react@19.0.12)(react@19.0.0)
     devDependencies:
       '@biomejs/biome':
         specifier: 1.9.4
@@ -1848,6 +1872,10 @@ packages:
   '@tanstack/virtual-core@3.13.5':
     resolution: {integrity: sha512-gMLNylxhJdUlfRR1G3U9rtuwUh2IjdrrniJIDcekVJN3/3i+bluvdMi3+eodnxzJq5nKnxnigo9h0lIpaqV6HQ==}
 
+  '@thednp/dommatrix@2.0.11':
+    resolution: {integrity: sha512-e4X97qU68a4ycieaGiRgmeE4KltnV8GPE1pUxdtgvJQBe4VvzL4a6Xxb+X8dI1cQrUVAkl3uSe5nGRXrAmNpkQ==}
+    engines: {node: '>=20', pnpm: '>=8.6.0'}
+
   '@tootallnate/once@2.0.0':
     resolution: {integrity: sha512-XCuKFP5PS55gnMVu3dty8KPatLqUoy/ZYzDzAGCQ8JNFCkLXzmI7vNHCR+XpbZaMWQK/vQubr7PkYq8g470J/A==}
     engines: {node: '>= 10'}
@@ -1891,6 +1919,12 @@ packages:
 
   '@types/katex@0.16.7':
     resolution: {integrity: sha512-HMwFiRujE5PjrgwHQ25+bsLJgowjGjm5Z8FVSf0N6PwgJrwxH0QxzHYDcKsTfV3wva0vzrpqMTJS2jXPr5BMEQ==}
+
+  '@types/lodash@4.17.16':
+    resolution: {integrity: sha512-HX7Em5NYQAXKW+1T+FiuG27NGwzJfCX3s1GjOa7ujxZa52kjJLOr4FUxT+giF6Tgxv1e+/czV/iTtBw27WTU9g==}
+
+  '@types/matter-js@0.19.8':
+    resolution: {integrity: sha512-W2ZWG58Lijv/4v768NgpeyFqqiOyslmAU7qqM1Lhz4XBoUgGtZtPz4CjcOKYtqHIak14dvPldslQhltqLTWwsw==}
 
   '@types/mdast@4.0.4':
     resolution: {integrity: sha512-kGaNbPh1k7AFzgpud/gMdvIm5xuECykRR+JnWKQno9TAXVa6WIVCGTPvYGekIDL4uwCZQSYbUxNBSb1aUo79oA==}
@@ -3355,6 +3389,9 @@ packages:
   lodash.merge@4.6.2:
     resolution: {integrity: sha512-0KpjqXRVvrYyCsX1swR/XTK0va6VQkQM6MNo7PqW77ByjAhoARA8EfrP1N4+KlKj8YS0ZUCtRT/YUuhyYDujIQ==}
 
+  lodash@4.17.21:
+    resolution: {integrity: sha512-v2kDEe57lecTulaDIuNTPy3Ry4gLGJ6Z1O3vE1krgXZNrsQ+LFTGHVxVjcXPs17LhbZVGedAJv8XZ1tvj5FvSg==}
+
   log-update@5.0.1:
     resolution: {integrity: sha512-5UtUDQ/6edw4ofyljDNcOVJQ4c7OjDro4h3y8e1GQL5iYElYclVHJ3zeWchylvMaKnDbDilC8irOVyexnA/Slw==}
     engines: {node: ^12.20.0 || ^14.13.1 || >=16.0.0}
@@ -3396,6 +3433,9 @@ packages:
   math-intrinsics@1.1.0:
     resolution: {integrity: sha512-/IXtbwEk5HTPyEwyKX6hGkYXxM9nbj64B+ilVJnC/R6B0pH5G4V3b0pVbL7DBj4tkhBAppbQUlf6F6Xl9LHu1g==}
     engines: {node: '>= 0.4'}
+
+  matter-js@0.20.0:
+    resolution: {integrity: sha512-iC9fYR7zVT3HppNnsFsp9XOoQdQN2tUyfaKg4CHLH8bN+j6GT4Gw7IH2rP0tflAebrHFw730RR3DkVSZRX8hwA==}
 
   mdast-util-find-and-replace@3.0.2:
     resolution: {integrity: sha512-Tmd1Vg/m3Xz43afeNxDIhWRtFZgM2VLyaf4vSTYwudTyeuTneoL3qtWMA5jeLyz/O1vDJmmV4QuScFCA2tBPwg==}
@@ -3941,6 +3981,9 @@ packages:
       react: ^17.0.2 || ^18 || ^19 || ^19.0.0-rc
       react-dom: ^17.0.2 || ^18 || ^19 || ^19.0.0-rc
 
+  poly-decomp@0.3.0:
+    resolution: {integrity: sha512-hWeBxGzPYiybmI4548Fca7Up/0k1qS5+79cVHI9+H33dKya5YNb9hxl0ZnDaDgvrZSuYFBhkCK/HOnqN7gefkQ==}
+
   postcss-selector-parser@6.0.10:
     resolution: {integrity: sha512-IQ7TZdoaqbT+LCpShg46jnZVlhWD2w6iQYAcYXfHARZ7X1t/UGhhceQDs5X0cGqKvYlHNOuv7Oa1xmb0oQuA3w==}
     engines: {node: '>=4'}
@@ -4063,6 +4106,11 @@ packages:
     resolution: {integrity: sha512-4GV5sHFG0e/0AD4X+ySy6UJd3jVl1iNsNHdpad0qhABJ11twS3TTBnseqsKurKcsNqCEFeGL3uLpVChpIO3QfQ==}
     peerDependencies:
       react: ^19.0.0
+
+  react-icons@5.5.0:
+    resolution: {integrity: sha512-MEFcXdkP3dLo8uumGI5xN3lDFNsRtrjbOEKDLD7yv76v4wpnEq2Lt2qeHaQOr34I/wPN3s3+N08WkQ+CW37Xiw==}
+    peerDependencies:
+      react: '*'
 
   react-virtual@2.10.4:
     resolution: {integrity: sha512-Ir6+oPQZTVHfa6+JL9M7cvMILstFZH/H3jqeYeKI4MSUX+rIruVwFC6nGVXw9wqAw8L0Kg2KvfXxI85OvYQdpQ==}
@@ -4503,6 +4551,10 @@ packages:
   svg-parser@2.0.4:
     resolution: {integrity: sha512-e4hG1hRwoOdRb37cIMSgzNsxyzKfayW6VOflrwvR+/bzrkyxY/31WkbgnQpgtrNp1SdpJvpUAGTa/ZoiPNDuRQ==}
 
+  svg-path-commander@2.1.10:
+    resolution: {integrity: sha512-ExltvdpY18rqpRp6PaWHNisB+Mugoeni0TbHcRNalt2fLs+i3eR6RMvLBsuN9YbKPl356DZgoT4FobRY7VQ+GQ==}
+    engines: {node: '>=16', pnpm: '>=8.6.0'}
+
   svgo@3.3.2:
     resolution: {integrity: sha512-OoohrmuUlBs8B8o6MB2Aevn+pRIH9zDALSR+6hhqVfa6fRwG/Qw9VUMSMW9VNg2CFc/MTIfabtdOVl9ODIJjpw==}
     engines: {node: '>=14.0.0'}
@@ -4860,6 +4912,24 @@ packages:
 
   zod@3.24.2:
     resolution: {integrity: sha512-lY7CDW43ECgW9u1TcT3IoXHflywfVqDYze4waEz812jR/bZ8FHDsl7pFQoSZTz5N+2NqRXs8GBwnAwo3ZNxqhQ==}
+
+  zustand@5.0.3:
+    resolution: {integrity: sha512-14fwWQtU3pH4dE0dOpdMiWjddcH+QzKIgk1cl8epwSE7yag43k/AD/m4L6+K7DytAOr9gGBe3/EXj9g7cdostg==}
+    engines: {node: '>=12.20.0'}
+    peerDependencies:
+      '@types/react': '>=18.0.0'
+      immer: '>=9.0.6'
+      react: '>=18.0.0'
+      use-sync-external-store: '>=1.2.0'
+    peerDependenciesMeta:
+      '@types/react':
+        optional: true
+      immer:
+        optional: true
+      react:
+        optional: true
+      use-sync-external-store:
+        optional: true
 
   zwitch@2.0.4:
     resolution: {integrity: sha512-bXE4cR/kVZhKZX/RjPEflHaKVhUVl85noU3v6b8apfQEc1x4A+zBxjZ4lN8LqGd6WZ3dl98pY4o717VFmoPp+A==}
@@ -6714,6 +6784,8 @@ snapshots:
 
   '@tanstack/virtual-core@3.13.5': {}
 
+  '@thednp/dommatrix@2.0.11': {}
+
   '@tootallnate/once@2.0.0': {}
 
   '@trysound/sax@0.2.0': {}
@@ -6754,6 +6826,10 @@ snapshots:
   '@types/json-schema@7.0.15': {}
 
   '@types/katex@0.16.7': {}
+
+  '@types/lodash@4.17.16': {}
+
+  '@types/matter-js@0.19.8': {}
 
   '@types/mdast@4.0.4':
     dependencies:
@@ -8347,6 +8423,8 @@ snapshots:
 
   lodash.merge@4.6.2: {}
 
+  lodash@4.17.21: {}
+
   log-update@5.0.1:
     dependencies:
       ansi-escapes: 5.0.0
@@ -8384,6 +8462,8 @@ snapshots:
   markdown-table@3.0.4: {}
 
   math-intrinsics@1.1.0: {}
+
+  matter-js@0.20.0: {}
 
   mdast-util-find-and-replace@3.0.2:
     dependencies:
@@ -9204,6 +9284,8 @@ snapshots:
       - search-insights
       - supports-color
 
+  poly-decomp@0.3.0: {}
+
   postcss-selector-parser@6.0.10:
     dependencies:
       cssesc: 3.0.0
@@ -9287,6 +9369,10 @@ snapshots:
     dependencies:
       react: 19.0.0
       scheduler: 0.25.0
+
+  react-icons@5.5.0(react@19.0.0):
+    dependencies:
+      react: 19.0.0
 
   react-virtual@2.10.4(react@19.0.0):
     dependencies:
@@ -9981,6 +10067,10 @@ snapshots:
 
   svg-parser@2.0.4: {}
 
+  svg-path-commander@2.1.10:
+    dependencies:
+      '@thednp/dommatrix': 2.0.11
+
   svgo@3.3.2:
     dependencies:
       '@trysound/sax': 0.2.0
@@ -10352,5 +10442,10 @@ snapshots:
   yn@3.1.1: {}
 
   zod@3.24.2: {}
+
+  zustand@5.0.3(@types/react@19.0.12)(react@19.0.0):
+    optionalDependencies:
+      '@types/react': 19.0.12
+      react: 19.0.0
 
   zwitch@2.0.4: {}

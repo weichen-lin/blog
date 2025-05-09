@@ -3,6 +3,7 @@ import 'pliny/search/algolia.css'
 import 'remark-github-blockquote-alert/alert.css'
 
 import SectionContainer from '@/components/SectionContainer'
+import Footer from '@/components/shared/Footer'
 import siteMetadata from '@/data/siteMetadata'
 import TanstackProvider from '@/lib/providers/TanstackProvider'
 import type { Metadata } from 'next'
@@ -97,13 +98,14 @@ export default function RootLayout({
       <meta name='theme-color' media='(prefers-color-scheme: light)' content='#fff' />
       <meta name='theme-color' media='(prefers-color-scheme: dark)' content='#000' />
       <link rel='alternate' type='application/rss+xml' href={`${basePath}/feed.xml`} />
-      <body className='bg-white pl-[calc(100vw-100%)] text-black antialiased dark:bg-neutral-950 dark:text-white'>
+      <body className='bg-white text-black antialiased dark:bg-neutral-950 dark:text-white'>
         <TanstackProvider>
           <ThemeProviders>
             <Analytics analyticsConfig={siteMetadata.analytics as AnalyticsConfig} />
             <SectionContainer>
               <SearchProvider searchConfig={siteMetadata.search as SearchConfig}>
                 <main>{children}</main>
+                <Footer />
               </SearchProvider>
             </SectionContainer>
           </ThemeProviders>

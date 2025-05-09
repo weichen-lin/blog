@@ -87,7 +87,7 @@ function Dock({
     return Math.max(DOCK_HEIGHT, magnification + magnification / 2 + 4)
   }, [magnification])
 
-  const heightRow = useTransform(isHovered, [0, 1], [panelHeight, maxHeight])
+  const heightRow = useTransform(isHovered, [0, 1], [maxHeight, panelHeight])
   const height = useSpring(heightRow, spring)
 
   return (
@@ -96,7 +96,7 @@ function Dock({
         height: height,
         scrollbarWidth: 'none',
       }}
-      className='mx-2 flex max-w-full items-end overflow-x-auto'
+      className='mx-2 flex max-w-full items-end'
     >
       <motion.div
         onMouseMove={({ pageX }) => {
@@ -145,7 +145,7 @@ function DockItem({ children, className }: DockItemProps) {
   return (
     <motion.div
       ref={ref}
-      style={{ width, height: width }}
+      style={{ width }}
       onHoverStart={() => isHovered.set(1)}
       onHoverEnd={() => isHovered.set(0)}
       onFocus={() => isHovered.set(1)}
@@ -185,7 +185,7 @@ function DockLabel({ children, className, ...rest }: DockLabelProps) {
           transition={{ duration: 0.2 }}
           className={cn(
             'absolute -top-6 left-1/2 w-fit border border-zinc-200 bg-gray-100 px-2 py-0.5 text-xs whitespace-pre text-neutral-700',
-            'dark:border-zinc-800 dark:bg-neutral-800 dark:text-white',
+            'dark:border-zinc-800 dark:bg-neutral-800 dark:text-white dark:ring-[1px]',
             className
           )}
           role='tooltip'

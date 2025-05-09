@@ -1,6 +1,5 @@
 import '@/css/roadCar.css'
 
-import Footer from '@/components/Footer'
 import Header from '@/components/Header'
 import Image from '@/components/Image'
 import { IssueCar, PoliceCar } from '@/components/car'
@@ -49,7 +48,7 @@ export default function Home() {
           </BoxReveal>
         </div>
       </div>
-      <Footer />
+      <footer className='h-[150px]'></footer>
     </BackgroundBeamsWithCollision>
   )
 }

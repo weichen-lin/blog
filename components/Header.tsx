@@ -1,12 +1,10 @@
 import headerNavLinks from '@/data/headerNavLinks'
-import logo from '@/data/left-logo.png'
 import Logo from '@/data/logo.svg'
 import siteMetadata from '@/data/siteMetadata'
 import { cn } from '@/lib/utils'
 import Link from './Link'
 import MobileNav from './MobileNav'
 import SearchButton from './SearchButton'
-import ThemeSwitch from './ThemeSwitch'
 
 const Header = () => {
   return (
@@ -45,7 +43,6 @@ const Header = () => {
             ))}
         </div>
         <SearchButton />
-        <ThemeSwitch />
         <MobileNav />
       </div>
     </header>
