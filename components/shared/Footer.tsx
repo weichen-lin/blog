@@ -2,8 +2,7 @@
 
 import { Dock, DockIcon, DockItem, DockLabel } from '@/components/Dock'
 import { cn } from '@/lib/utils'
-import { BookHeart, Boxes, Home, Info, MonitorSmartphone, Moon, Notebook, Sun } from 'lucide-react'
-import { motion } from 'motion/react'
+import { Boxes, Home, Info, MonitorSmartphone, Moon, Notebook, Sun } from 'lucide-react'
 import { useTheme } from 'next-themes'
 import Link from 'next/link'
 import { useEffect, useState } from 'react'
@@ -48,7 +47,6 @@ const ThemeSwitcher = () => {
 const Routes = [
   { name: 'Home', icon: <Home />, path: '/' },
   { name: 'About', icon: <Info />, path: '/about' },
-  { name: 'Skills', icon: <BookHeart />, path: '/skills' },
   { name: 'Projects', icon: <Boxes />, path: '/projects' },
   { name: 'Blog', icon: <Notebook />, path: '/blog' },
 ]

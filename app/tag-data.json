@@ -1,8 +1,8 @@
 {
+  "vercel": 1,
+  "nextjs": 1,
   "rate-limiting": 1,
   "system-design": 1,
   "backend-development": 1,
-  "algorithm": 1,
-  "vercel": 1,
-  "nextjs": 1
+  "algorithm": 1
 }

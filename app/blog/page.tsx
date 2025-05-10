@@ -1,4 +1,3 @@
-import { Tabs } from '@/components/ui/tabs'
 import ListLayout from '@/layouts/ListLayoutWithTags'
 import PageLayout from '@/layouts/PageLayout'
 import { genPageMetadata } from 'app/seo'
@@ -21,5 +20,14 @@ export default async function BlogPage(props: {
     totalPages: totalPages,
   }
 
-  return <PageLayout>asd</PageLayout>
+  return (
+    <PageLayout>
+      <ListLayout
+        posts={posts}
+        initialDisplayPosts={initialDisplayPosts}
+        pagination={pagination}
+        title='All Posts'
+      />
+    </PageLayout>
+  )
 }
