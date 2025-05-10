@@ -1,5 +1,6 @@
 import AuthorLayout from '@/layouts/AuthorLayout'
 import PageLayout from '@/layouts/PageLayout'
+import GravitySkills from 'app/about/gravity'
 import { genPageMetadata } from 'app/seo'
 import { type Authors, allAuthors } from 'contentlayer/generated'
 import { MDXLayoutRenderer } from 'pliny/mdx-components'
@@ -15,11 +16,9 @@ export default function Page() {
   return (
     <PageLayout>
       <AuthorLayout content={mainContent}>
-        <div className='w-full flex flex-col'>
-          <Calendar />
-        </div>
-        <MDXLayoutRenderer code={author.body.code} />
+        <Calendar />
       </AuthorLayout>
+      <GravitySkills />
     </PageLayout>
   )
 }

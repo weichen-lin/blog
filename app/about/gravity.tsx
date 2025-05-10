@@ -176,7 +176,7 @@ const SKILL: {
   },
 ]
 
-export default function Preview() {
+export default function GravitySkills() {
   const [activeTab, setActiveTab] = useState(0)
 
   return (

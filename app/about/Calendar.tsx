@@ -35,7 +35,7 @@ const Calendar = () => {
 
   return (
     <>
-      <div className='relative flex flex-col gap-[2px]'>
+      <div className='relative flex flex-col gap-[2px] w-full'>
         <div className='flex justify-start gap-[3px] overflow-hidden'>
           {weeks?.map((week) => (
             <div key={week.firstDay}>

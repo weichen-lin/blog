@@ -44,10 +44,9 @@ export default async function BlogPage(props: {
   }
 
   return (
-    <div className='flex flex-col justify-between h-screen'>
+    <div className='flex flex-col h-screen'>
       <Header />
       <Preview />
-      {/* <Footer /> */}
     </div>
   )
 }
