@@ -1,0 +1,90 @@
+---
+title: 🚧 突破高併發瓶頸：Node.js `undici` 連線池的最佳化實戰
+date: "2025-10-30"
+tags:
+  [
+    "node.js",
+    "undici",
+    "http",
+    "connection pooling",
+    "performance tuning",
+    "backend development",
+  ]
+draft: false
+summary: 本文探討在高併發情境下，Node.js 內建的 `undici` 模組在預設配置下可能導致的效能瓶頸，並提供限制連線池、調整 Keep-Alive 機制的實戰最佳化方案。
+---
+
+最近在處理一個後端服務 **A** 的效能問題時，我們遇到了一個棘手的情境：當服務 **A** 必須向外部服務 **B** 發送大量請求（高併發）時，服務 **A** 整體的響應時間（Response Time）會顯著飆升。
+
+我們很快排除了服務 **B** 本身效能不佳的可能，因為單一請求的測試顯示其處理速度非常快。問題的根源最終被鎖定在服務 **A** **向外發出 HTTP 請求**的機制上。
+
+### 🔍 根本原因：`undici` 預設行為導致連線爆炸
+
+Node.js 18 之後內建的 `undici` 模組，作為新的 HTTP 客戶端，其預設的 **Connection Pool (連線池)** 設定是導致問題的關鍵：
+
+#### 1\. 沒有設定連線數上限 (`connections: null`)
+
+這是預設的配置：
+
+```javascript
+// 預設這樣
+setGlobalDispatcher(new Agent({ connections: null }));
+```
+
+在這種預設模式下，當系統面對高併發流量時，每當現有閒置連線「不夠用」或「被誤判不可用」時，`undici` 會**無限地開啟新的 TCP 連線 (Socket)**。
+
+> 💡 **後果：**
+> 高併發下，這會瞬間建立幾十、上百個 Socket，導致作業系統 (OS) **耗盡 File Descriptors 資源**，或是 **CPU 資源飽和**在處理大量的 TCP 連線建立與拆卸上，進而拖垮整個服務的效能。
+
+#### 2\. `keepAliveTimeout` 可能過短 (預設 10 秒)
+
+`undici` 預設的閒置連線存活時間是 `10_000` 毫秒（10 秒）。
+
+如果服務 B 的響應較慢，或者請求路徑中間有 Proxy 伺服器，這個閒置連線很可能在被重用之前就被**過早關閉**。這會導致下一次請求又得**重新建立 TCP 連線**，造成連線池的「**假重用**」現象，持續加劇資源消耗。
+
+---
+
+### 🚀 解決方案：強制限制連線池與延長 Keep-Alive
+
+解決這個問題的根本方法是：**限制對同一 Host 的最大並行連線數**，並**延長閒置連線的存活時間**，以確保 TCP 連線能被高效地重用。
+
+#### 1\. 限制 Connection Pool（強烈建議）
+
+我們需要使用 `undici` 的 `Agent` 來設定全域的連線限制。
+
+根據我們對服務負載的評估（例如：50 RPS x 200ms Latency $\approx 10$ 個並行請求），理論上只需要 10 個連線就足夠。我們設定一個稍高的值以預留緩衝空間。
+
+#### 2\. 延長 Keep-Alive Timeout
+
+將 `keepAliveTimeout` 延長至 30 秒或 60 秒，可以有效減少連線被 Proxy 或遠端服務過早關閉的機率，提升連線重用率。
+
+### 🛠 實作程式碼 (TypeScript/JavaScript)
+
+我們應該在應用程式啟動時，**所有 `fetch` 或 `undici` 相關操作之前**，配置全域的 `Dispatcher`：
+
+```typescript
+// 在應用程式最一開始（所有 fetch 之前）加入
+import { setGlobalDispatcher, Agent } from "undici";
+
+// 設定最大並行連線數為 15
+const MAX_CONNECTIONS = 15;
+
+setGlobalDispatcher(
+  new Agent({
+    connections: MAX_CONNECTIONS, // 限制每個 host 最多 15 個連線
+    pipelining: 1, // 可選：減少 head-of-line blocking
+    keepAliveTimeout: 60_000, // 延長閒置連線存活時間至 1 分鐘
+  })
+);
+
+console.log(`已設定 undici 全域連線池上限為: ${MAX_CONNECTIONS}`);
+```
+
+### 📈 驗證與結果
+
+實施上述配置後，重新進行壓力測試，我們觀察到：
+
+1.  **Response Time** 顯著恢復正常，服務 A 的整體效能瓶頸被解除。
+2.  `undici` 連線池的 `connected` 數量穩定在設定的 `MAX_CONNECTIONS` 上限附近，不再無限膨脹。
+
+> **總結：** 預設的 `undici` 在注重 **高併發且穩定** 的後端服務中，必須手動限制連線池數量，以防止在高負載下因無限開新連線而導致系統資源耗盡。
