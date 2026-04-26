@@ -1,4 +1,6 @@
 {
+  "vercel": 1,
+  "nextjs": 1,
   "nodejs": 1,
   "undici": 1,
   "http": 1,
@@ -7,7 +9,5 @@
   "backend-development": 2,
   "rate-limiting": 1,
   "system-design": 1,
-  "algorithm": 1,
-  "vercel": 1,
-  "nextjs": 1
+  "algorithm": 1
 }
