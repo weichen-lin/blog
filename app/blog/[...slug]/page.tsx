@@ -1,20 +1,17 @@
 import 'css/prism.css'
 import 'katex/dist/katex.css'
-import Script from 'next/script'
-
+import type { Authors, Blog } from 'contentlayer/generated'
+import { allAuthors, allBlogs } from 'contentlayer/generated'
+import type { Metadata } from 'next'
+import { notFound } from 'next/navigation'
+import { MDXLayoutRenderer } from 'pliny/mdx-components'
+import { allCoreContent, coreContent, sortPosts } from 'pliny/utils/contentlayer'
 import { components } from '@/components/MDXComponents'
-import PageTitle from '@/components/PageTitle'
 import siteMetadata from '@/data/siteMetadata'
 import PageLayout from '@/layouts/PageLayout'
 import PostBanner from '@/layouts/PostBanner'
 import PostLayout from '@/layouts/PostLayout'
 import PostSimple from '@/layouts/PostSimple'
-import { allAuthors, allBlogs } from 'contentlayer/generated'
-import type { Authors, Blog } from 'contentlayer/generated'
-import type { Metadata } from 'next'
-import { notFound } from 'next/navigation'
-import { MDXLayoutRenderer } from 'pliny/mdx-components'
-import { allCoreContent, coreContent, sortPosts } from 'pliny/utils/contentlayer'
 
 const defaultLayout = 'PostLayout'
 const layouts = {
@@ -81,9 +78,7 @@ export const generateStaticParams = async () => {
   }))
 }
 
-export default async function Page(props: {
-  params: Promise<{ slug: string[] }>
-}) {
+export default async function Page(props: { params: Promise<{ slug: string[] }> }) {
   const params = await props.params
   const slug = decodeURI(params.slug.join('/'))
   // Filter out drafts in production

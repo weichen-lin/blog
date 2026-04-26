@@ -1,8 +1,8 @@
 'use client'
 
-import { cn } from '@/lib/utils'
 import { motion } from 'motion/react'
 import { useState } from 'react'
+import { cn } from '@/lib/utils'
 
 type Tab = {
   title: string

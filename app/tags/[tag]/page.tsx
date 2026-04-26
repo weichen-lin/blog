@@ -1,12 +1,12 @@
-import siteMetadata from '@/data/siteMetadata'
-import ListLayout from '@/layouts/ListLayoutWithTags'
-import PageLayout from '@/layouts/PageLayout'
 import { genPageMetadata } from 'app/seo'
 import tagData from 'app/tag-data.json'
 import { allBlogs } from 'contentlayer/generated'
 import { slug } from 'github-slugger'
 import type { Metadata } from 'next'
 import { allCoreContent, sortPosts } from 'pliny/utils/contentlayer'
+import siteMetadata from '@/data/siteMetadata'
+import ListLayout from '@/layouts/ListLayoutWithTags'
+import PageLayout from '@/layouts/PageLayout'
 
 const POSTS_PER_PAGE = 5
 
@@ -29,9 +29,7 @@ export const generateStaticParams = async () => {
   }))
 }
 
-export default async function TagPage(props: {
-  params: Promise<{ tag: string }>
-}) {
+export default async function TagPage(props: { params: Promise<{ tag: string }> }) {
   const params = await props.params
   const tag = decodeURI(params.tag)
   const title = tag[0].toUpperCase() + tag.split(' ').join('-').slice(1)

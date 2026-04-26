@@ -1,5 +1,5 @@
-import siteMetadata from '@/data/siteMetadata'
 import type { MetadataRoute } from 'next'
+import siteMetadata from '@/data/siteMetadata'
 
 export const dynamic = 'force-static'
 

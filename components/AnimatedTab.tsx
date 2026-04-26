@@ -1,31 +1,31 @@
-'use client'
+"use client";
 
-import { cn } from '@/lib/utils'
-import { AnimatePresence, motion } from 'motion/react'
-import { useEffect, useRef, useState } from 'react'
+import { AnimatePresence, motion } from "motion/react";
+import { useEffect, useRef, useState } from "react";
+import { cn } from "@/lib/utils";
 
 interface AnimatedTabProps {
-  tabs: string[]
-  onChange: (index: number) => void
-  className?: string
+  tabs: string[];
+  onChange: (index: number) => void;
+  className?: string;
 }
 
 export default function AnimatedTab(props: AnimatedTabProps) {
-  const { tabs, onChange } = props
+  const { tabs, onChange } = props;
 
-  const [activeTab, setActiveTab] = useState(0)
+  const [activeTab, setActiveTab] = useState(0);
 
-  const tabRefs = useRef<(HTMLButtonElement | null)[]>([])
-  const navRef = useRef<HTMLElement | null>(null)
+  const tabRefs = useRef<(HTMLButtonElement | null)[]>([]);
+  const navRef = useRef<HTMLElement | null>(null);
 
-  const [hoveredIdx, setHoveredIdx] = useState<number | null>(null)
+  const [hoveredIdx, setHoveredIdx] = useState<number | null>(null);
 
   const hoveredTabRect =
     hoveredIdx !== null && tabRefs.current[hoveredIdx]
       ? tabRefs.current[hoveredIdx]?.getBoundingClientRect()
-      : null
+      : null;
 
-  const navRect = navRef.current?.getBoundingClientRect()
+  const navRect = navRef.current?.getBoundingClientRect();
 
   const relativePosition =
     hoveredTabRect && navRect
@@ -35,37 +35,37 @@ export default function AnimatedTab(props: AnimatedTabProps) {
           width: hoveredTabRect.width,
           height: hoveredTabRect.height,
         }
-      : null
+      : null;
 
   useEffect(() => {
-    tabRefs.current = tabRefs.current.slice(0, tabs.length)
-  }, [tabs.length])
+    tabRefs.current = tabRefs.current.slice(0, tabs.length);
+  }, [tabs.length]);
 
   return (
     <nav
       ref={navRef}
       onMouseLeave={() => {
-        setHoveredIdx(null)
+        setHoveredIdx(null);
       }}
       className={cn(
-        'bg-background flex items-center border-b p-2 relative gap-x-2',
-        props.className
+        "bg-background flex items-center border-b p-2 relative gap-x-2",
+        props.className,
       )}
     >
       {tabs.map((tab, index) => (
         <button
           ref={(el) => {
-            tabRefs.current[index] = el
+            tabRefs.current[index] = el;
           }}
           key={tab}
           className={cn(
-            'px-3 py-1.5 z-10 font-medium cursor-pointer',
-            activeTab === index && 'bg-gray-200 rounded-md'
+            "px-3 py-1.5 z-10 font-medium cursor-pointer dark:text-slate-300 dark:hover:text-slate-700 hover:bg-gray-200/50 rounded-md transition-colors",
+            activeTab === index && "bg-gray-200 dark:text-slate-700 rounded-md",
           )}
           onPointerEnter={() => setHoveredIdx(index)}
           onClick={() => {
-            setActiveTab(index)
-            onChange(index)
+            setActiveTab(index);
+            onChange(index);
           }}
         >
           {tab}
@@ -74,7 +74,7 @@ export default function AnimatedTab(props: AnimatedTabProps) {
       <AnimatePresence>
         {relativePosition ? (
           <motion.div
-            className='absolute top-0 left-0 bg-gray-200 rounded-md pointer-events-none'
+            className="absolute top-0 left-0 bg-gray-200 rounded-md pointer-events-none"
             initial={{
               top: relativePosition.top,
               left: relativePosition.left,
@@ -103,5 +103,5 @@ export default function AnimatedTab(props: AnimatedTabProps) {
         ) : null}
       </AnimatePresence>
     </nav>
-  )
+  );
 }

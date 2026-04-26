@@ -1,11 +1,10 @@
 'use client'
 
-import { cn } from '@/lib/utils'
 import {
   AnimatePresence,
   type MotionValue,
-  type SpringOptions,
   motion,
+  type SpringOptions,
   useMotionValue,
   useSpring,
   useTransform,
@@ -20,6 +19,7 @@ import {
   useRef,
   useState,
 } from 'react'
+import { cn } from '@/lib/utils'
 
 const DOCK_HEIGHT = 128
 const DEFAULT_MAGNIFICATION = 80
@@ -37,6 +37,7 @@ type DockProps = {
 type DockItemProps = {
   className?: string
   children: React.ReactNode
+  onClick?: () => void
 }
 type DockLabelProps = {
   className?: string
@@ -122,7 +123,7 @@ function Dock({
   )
 }
 
-function DockItem({ children, className }: DockItemProps) {
+function DockItem({ children, className, onClick }: DockItemProps) {
   const ref = useRef<HTMLDivElement>(null)
 
   const { distance, magnification, mouseX, spring } = useDock()
@@ -150,7 +151,10 @@ function DockItem({ children, className }: DockItemProps) {
       onHoverEnd={() => isHovered.set(0)}
       onFocus={() => isHovered.set(1)}
       onBlur={() => isHovered.set(0)}
-      className={cn('relative inline-flex items-center justify-center cursor-pointer', className)}
+      onClick={onClick}
+      whileTap={{ scale: 0.82 }}
+      transition={{ type: 'spring', stiffness: 400, damping: 20 }}
+      className={cn('relative inline-flex items-center justify-center cursor-pointer select-none', className)}
       tabIndex={0}
       role='button'
       aria-haspopup='true'
@@ -164,7 +168,7 @@ function DockItem({ children, className }: DockItemProps) {
 
 function DockLabel({ children, className, ...rest }: DockLabelProps) {
   const restProps = rest as Record<string, unknown>
-  const isHovered = restProps['isHovered'] as MotionValue<number>
+  const isHovered = restProps.isHovered as MotionValue<number>
   const [isVisible, setIsVisible] = useState(false)
 
   useEffect(() => {
@@ -200,7 +204,7 @@ function DockLabel({ children, className, ...rest }: DockLabelProps) {
 
 function DockIcon({ children, className, ...rest }: DockIconProps) {
   const restProps = rest as Record<string, unknown>
-  const width = restProps['width'] as MotionValue<number>
+  const width = restProps.width as MotionValue<number>
 
   const widthTransform = useTransform(width, (val) => val / 2)
 

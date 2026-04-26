@@ -1,7 +1,7 @@
 'use client'
-import { cn } from '@/lib/utils'
 import { AnimatePresence, motion } from 'motion/react'
-import React, { useRef, useState, useEffect } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
+import { cn } from '@/lib/utils'
 
 export const BackgroundBeamsWithCollision = ({
   children,
@@ -114,7 +114,7 @@ const CollisionMechanism = React.forwardRef<
       repeatDelay?: number
     }
   }
->(({ parentRef, containerRef, beamOptions = {} }, ref) => {
+>(({ parentRef, containerRef, beamOptions = {} }, _ref) => {
   const beamRef = useRef<HTMLDivElement>(null)
   const [collision, setCollision] = useState<{
     detected: boolean

@@ -1,9 +1,9 @@
-import ListLayout from '@/layouts/ListLayoutWithTags'
 import tagData from 'app/tag-data.json'
 import { allBlogs } from 'contentlayer/generated'
 import { slug } from 'github-slugger'
 import { notFound } from 'next/navigation'
 import { allCoreContent, sortPosts } from 'pliny/utils/contentlayer'
+import ListLayout from '@/layouts/ListLayoutWithTags'
 
 const POSTS_PER_PAGE = 5
 
@@ -23,7 +23,7 @@ export default async function TagPage(props: { params: Promise<{ tag: string; pa
   const params = await props.params
   const tag = decodeURI(params.tag)
   const title = tag[0].toUpperCase() + tag.split(' ').join('-').slice(1)
-  const pageNumber = Number.parseInt(params.page)
+  const pageNumber = Number.parseInt(params.page, 10)
   const filteredPosts = allCoreContent(
     sortPosts(allBlogs.filter((post) => post.tags?.map((t) => slug(t)).includes(tag)))
   )

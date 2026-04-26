@@ -1,9 +1,8 @@
 'use client'
 
 import NumberTicker from '@/components/ui/number-ticker'
-import useContributions from './useContributions'
-
 import { OverviewSkeleton } from './Skeleton'
+import useContributions from './useContributions'
 
 const Overview = () => {
   const { isLoading, data } = useContributions()

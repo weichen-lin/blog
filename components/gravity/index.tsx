@@ -1,73 +1,78 @@
-'use client'
+"use client";
 
-import { calculatePosition, parsePathToVertices } from '@/components/gravity/util'
-import { debounce } from 'lodash'
-import type Matter from 'matter-js'
+import { debounce } from "lodash";
+import type Matter from "matter-js";
 import {
   Bodies,
   Common,
   Engine,
-  Events,
   Mouse,
   MouseConstraint,
-  Query,
   Render,
   Runner,
   World,
-} from 'matter-js'
+} from "matter-js";
 import {
-  type ReactNode,
   createContext,
   forwardRef,
+  type ReactNode,
   useCallback,
   useContext,
   useEffect,
   useImperativeHandle,
   useRef,
   useState,
-} from 'react'
+} from "react";
+import {
+  calculatePosition,
+  parsePathToVertices,
+} from "@/components/gravity/util";
 
-import { cn } from '@/lib/utils'
+import { cn } from "@/lib/utils";
 
 type GravityProps = {
-  children: ReactNode
-  debug?: boolean
-  gravity?: { x: number; y: number }
-  resetOnResize?: boolean
-  grabCursor?: boolean
-  addTopWall?: boolean
-  autoStart?: boolean
-  className?: string
-}
+  children: ReactNode;
+  debug?: boolean;
+  gravity?: { x: number; y: number };
+  resetOnResize?: boolean;
+  grabCursor?: boolean;
+  addTopWall?: boolean;
+  autoStart?: boolean;
+  className?: string;
+};
 
 type PhysicsBody = {
-  element: HTMLElement
-  body: Matter.Body
-  props: MatterBodyProps
-}
+  element: HTMLElement;
+  body: Matter.Body;
+  props: MatterBodyProps;
+};
 
 type MatterBodyProps = {
-  children: ReactNode
-  matterBodyOptions?: Matter.IBodyDefinition
-  isDraggable?: boolean
-  bodyType?: 'rectangle' | 'circle' | 'svg'
-  sampleLength?: number
-  x?: number | string
-  y?: number | string
-  angle?: number
-  className?: string
-}
+  children: ReactNode;
+  matterBodyOptions?: Matter.IBodyDefinition;
+  isDraggable?: boolean;
+  bodyType?: "rectangle" | "circle" | "svg";
+  sampleLength?: number;
+  x?: number | string;
+  y?: number | string;
+  angle?: number;
+  className?: string;
+};
 
 export type GravityRef = {
-  start: () => void
-  stop: () => void
-  reset: () => void
-}
+  start: () => void;
+  stop: () => void;
+  reset: () => void;
+};
 
 const GravityContext = createContext<{
-  registerElement: (id: string, element: HTMLElement, props: MatterBodyProps) => void
-  unregisterElement: (id: string) => void
-} | null>(null)
+  registerElement: (
+    id: string,
+    element: HTMLElement,
+    props: MatterBodyProps,
+  ) => void;
+  unregisterElement: (id: string) => void;
+} | null>(null);
 
 export const MatterBody = ({
   children,
@@ -78,7 +83,7 @@ export const MatterBody = ({
     density: 0.001,
     isStatic: false,
   },
-  bodyType = 'rectangle',
+  bodyType = "rectangle",
   isDraggable = true,
   sampleLength = 15,
   x = 0,
@@ -86,12 +91,12 @@ export const MatterBody = ({
   angle = 0,
   ...props
 }: MatterBodyProps) => {
-  const elementRef = useRef<HTMLDivElement>(null)
-  const idRef = useRef(Math.random().toString(36).substring(7))
-  const context = useContext(GravityContext)
+  const elementRef = useRef<HTMLDivElement>(null);
+  const idRef = useRef(Math.random().toString(36).substring(7));
+  const context = useContext(GravityContext);
 
   useEffect(() => {
-    if (!elementRef.current || !context) return
+    if (!elementRef.current || !context) return;
     context.registerElement(idRef.current, elementRef.current, {
       children,
       matterBodyOptions,
@@ -102,20 +107,24 @@ export const MatterBody = ({
       y,
       angle,
       ...props,
-    })
+    });
 
-    return () => context.unregisterElement(idRef.current)
-  }, [props, children, matterBodyOptions, isDraggable])
+    return () => context.unregisterElement(idRef.current);
+  }, [props, children, matterBodyOptions, isDraggable]);
 
   return (
     <div
       ref={elementRef}
-      className={cn('absolute', className, isDraggable && 'pointer-events-none')}
+      className={cn(
+        "absolute",
+        className,
+        isDraggable && "pointer-events-none",
+      )}
     >
       {children}
     </div>
-  )
-}
+  );
+};
 
 const Gravity = forwardRef<GravityRef, GravityProps>(
   (
@@ -130,118 +139,123 @@ const Gravity = forwardRef<GravityRef, GravityProps>(
       className,
       ...props
     },
-    ref
+    ref,
   ) => {
-    const canvas = useRef<HTMLDivElement>(null)
-    const engine = useRef(Engine.create())
-    const render = useRef<Render>(null)
-    const runner = useRef<Runner>(null)
-    const bodiesMap = useRef(new Map<string, PhysicsBody>())
-    const frameId = useRef<number>(0)
-    const mouseConstraint = useRef<Matter.MouseConstraint>(null)
-    const mouseDown = useRef(false)
-    const [canvasSize, setCanvasSize] = useState({ width: 0, height: 0 })
+    const canvas = useRef<HTMLDivElement>(null);
+    const engine = useRef(Engine.create());
+    const render = useRef<Render>(null);
+    const runner = useRef<Runner>(null);
+    const bodiesMap = useRef(new Map<string, PhysicsBody>());
+    const frameId = useRef<number>(0);
+    const mouseConstraint = useRef<Matter.MouseConstraint>(null);
+    const _mouseDown = useRef(false);
+    const [canvasSize, setCanvasSize] = useState({ width: 0, height: 0 });
 
-    const isRunning = useRef(false)
+    const isRunning = useRef(false);
 
     // Register Matter.js body in the physics world
     const registerElement = useCallback(
       (id: string, element: HTMLElement, props: MatterBodyProps) => {
-        if (!canvas.current) return
-        const width = element.offsetWidth
-        const height = element.offsetHeight
-        const canvasRect = canvas.current!.getBoundingClientRect()
+        if (!canvas.current) return;
+        const width = element.offsetWidth;
+        const height = element.offsetHeight;
+        const canvasRect = canvas.current?.getBoundingClientRect();
 
-        const angle = (props.angle || 0) * (Math.PI / 180)
+        const angle = (props.angle || 0) * (Math.PI / 180);
 
-        const x = calculatePosition(props.x, canvasRect.width, width)
-        const y = calculatePosition(props.y, canvasRect.height, height)
+        const bodyOptions: Matter.IChamferableBodyDefinition = (() => {
+          const { chamfer, ...rest } = props.matterBodyOptions ?? {};
+          return chamfer != null ? { ...rest, chamfer } : rest;
+        })();
 
-        let body
-        if (props.bodyType === 'circle') {
-          const radius = Math.max(width, height) / 2
+        const x = calculatePosition(props.x, canvasRect.width, width);
+        const y = calculatePosition(props.y, canvasRect.height, height);
+
+        let body;
+        if (props.bodyType === "circle") {
+          const radius = Math.max(width, height) / 2;
           body = Bodies.circle(x, y, radius, {
-            ...props.matterBodyOptions,
+            ...bodyOptions,
             angle: angle,
             render: {
-              fillStyle: debug ? '#888888' : '#00000000',
-              strokeStyle: debug ? '#333333' : '#00000000',
+              fillStyle: debug ? "#888888" : "#00000000",
+              strokeStyle: debug ? "#333333" : "#00000000",
               lineWidth: debug ? 3 : 0,
             },
-          })
-        } else if (props.bodyType === 'svg') {
-          const paths = element.querySelectorAll('path')
-          const vertexSets: Matter.Vector[][] = []
+          });
+        } else if (props.bodyType === "svg") {
+          const paths = element.querySelectorAll("path");
+          const vertexSets: Matter.Vector[][] = [];
 
           paths.forEach((path) => {
-            const d = path.getAttribute('d')
-            const p = parsePathToVertices(d!, props.sampleLength)
-            vertexSets.push(p)
-          })
+            const d = path.getAttribute("d");
+            const p = parsePathToVertices(d!, props.sampleLength);
+            vertexSets.push(p);
+          });
 
           body = Bodies.fromVertices(x, y, vertexSets, {
-            ...props.matterBodyOptions,
+            ...bodyOptions,
             angle: angle,
             render: {
-              fillStyle: debug ? '#888888' : '#00000000',
-              strokeStyle: debug ? '#333333' : '#00000000',
+              fillStyle: debug ? "#888888" : "#00000000",
+              strokeStyle: debug ? "#333333" : "#00000000",
               lineWidth: debug ? 3 : 0,
             },
-          })
+          });
         } else {
           body = Bodies.rectangle(x, y, width, height, {
-            ...props.matterBodyOptions,
+            ...bodyOptions,
             angle: angle,
             render: {
-              fillStyle: debug ? '#888888' : '#00000000',
-              strokeStyle: debug ? '#333333' : '#00000000',
+              fillStyle: debug ? "#888888" : "#00000000",
+              strokeStyle: debug ? "#333333" : "#00000000",
               lineWidth: debug ? 3 : 0,
             },
-          })
+          });
         }
 
         if (body) {
-          World.add(engine.current.world, [body])
-          bodiesMap.current.set(id, { element, body, props })
+          World.add(engine.current.world, [body]);
+          bodiesMap.current.set(id, { element, body, props });
         }
       },
-      [debug]
-    )
+      [debug],
+    );
 
     // Unregister Matter.js body from the physics world
     const unregisterElement = useCallback((id: string) => {
-      const body = bodiesMap.current.get(id)
+      const body = bodiesMap.current.get(id);
       if (body) {
-        World.remove(engine.current.world, body.body)
-        bodiesMap.current.delete(id)
+        World.remove(engine.current.world, body.body);
+        bodiesMap.current.delete(id);
       }
-    }, [])
+    }, []);
 
     // Keep react elements in sync with the physics world
     const updateElements = useCallback(() => {
       bodiesMap.current.forEach(({ element, body }) => {
-        const { x, y } = body.position
-        const rotation = body.angle * (180 / Math.PI)
+        const { x, y } = body.position;
+        const rotation = body.angle * (180 / Math.PI);
 
         element.style.transform = `translate(${
           x - element.offsetWidth / 2
-        }px, ${y - element.offsetHeight / 2}px) rotate(${rotation}deg)`
-      })
+        }px, ${y - element.offsetHeight / 2}px) rotate(${rotation}deg)`;
+      });
 
-      frameId.current = requestAnimationFrame(updateElements)
-    }, [])
+      frameId.current = requestAnimationFrame(updateElements);
+    }, []);
 
     // Clear the Matter.js world
     const initializeRenderer = useCallback(() => {
-      if (!canvas.current) return
+      if (!canvas.current) return;
 
-      const height = canvas.current.offsetHeight
-      const width = canvas.current.offsetWidth
+      const height = canvas.current.offsetHeight;
+      const width = canvas.current.offsetWidth;
 
-      Common.setDecomp(require('poly-decomp'))
+      Common.setDecomp(require("poly-decomp"));
 
-      engine.current.gravity.x = gravity.x
-      engine.current.gravity.y = gravity.y
+      engine.current.gravity.x = gravity.x;
+      engine.current.gravity.y = gravity.y;
 
       render.current = Render.create({
         element: canvas.current,
@@ -250,11 +264,13 @@ const Gravity = forwardRef<GravityRef, GravityProps>(
           width,
           height,
           wireframes: debug, // 建議在 debug 模式下開啟 wireframes 方便觀察
-          background: '#00000000',
+          background: "#00000000",
         },
-      })
+      });
 
-      const mouse = Mouse.create(render.current.canvas)
+      render.current.canvas.style.pointerEvents = "none";
+
+      const mouse = Mouse.create(render.current.canvas);
       mouseConstraint.current = MouseConstraint.create(engine.current, {
         mouse: mouse,
         constraint: {
@@ -263,147 +279,179 @@ const Gravity = forwardRef<GravityRef, GravityProps>(
             visible: debug,
           },
         },
-      }) // Add walls
+      }); // Add walls
 
-      const wallThickness = 20 // 牆壁厚度
+      const wallThickness = 20; // 牆壁厚度
       const walls = [
         // Floor - 中心位置調整為 height + wallThickness / 2
-        Bodies.rectangle(width / 2, height + wallThickness / 2, width, wallThickness, {
-          isStatic: true,
-          friction: 1,
-          render: {
-            visible: debug,
-          },
-        }), // Right wall - 中心位置調整為 width + wallThickness / 2
-
-        Bodies.rectangle(width + wallThickness / 2, height / 2, wallThickness, height, {
-          isStatic: true,
-          friction: 1,
-          render: {
-            visible: debug,
-          },
-        }), // Left wall - 中心位置調整為 -wallThickness / 2
-
-        Bodies.rectangle(-wallThickness / 2, height / 2, wallThickness, height, {
-          isStatic: true,
-          friction: 1,
-          render: {
-            visible: debug,
-          },
-        }),
-      ]
-
-      const topWall = addTopWall
-        ? Bodies.rectangle(width / 2, -wallThickness / 2, width, wallThickness, {
+        Bodies.rectangle(
+          width / 2,
+          height + wallThickness / 2,
+          width,
+          wallThickness,
+          {
             isStatic: true,
             friction: 1,
             render: {
               visible: debug,
             },
-          })
-        : null
+          },
+        ), // Right wall - 中心位置調整為 width + wallThickness / 2
+
+        Bodies.rectangle(
+          width + wallThickness / 2,
+          height / 2,
+          wallThickness,
+          height,
+          {
+            isStatic: true,
+            friction: 1,
+            render: {
+              visible: debug,
+            },
+          },
+        ), // Left wall - 中心位置調整為 -wallThickness / 2
+
+        Bodies.rectangle(
+          -wallThickness / 2,
+          height / 2,
+          wallThickness,
+          height,
+          {
+            isStatic: true,
+            friction: 1,
+            render: {
+              visible: debug,
+            },
+          },
+        ),
+      ];
+
+      const topWall = addTopWall
+        ? Bodies.rectangle(
+            width / 2,
+            -wallThickness / 2,
+            width,
+            wallThickness,
+            {
+              isStatic: true,
+              friction: 1,
+              render: {
+                visible: debug,
+              },
+            },
+          )
+        : null;
 
       if (topWall) {
-        walls.push(topWall)
+        walls.push(topWall);
       } // ... rest of the function remains the same
       // Add walls
 
-      World.add(engine.current.world, [mouseConstraint.current, ...walls])
+      World.add(engine.current.world, [mouseConstraint.current, ...walls]);
 
-      render.current.mouse = mouse
+      render.current.mouse = mouse;
 
-      runner.current = Runner.create()
-      Render.run(render.current)
-      updateElements()
-      runner.current.enabled = false
+      runner.current = Runner.create();
+      Render.run(render.current);
+      updateElements();
+      runner.current.enabled = false;
 
       if (autoStart) {
-        runner.current.enabled = true
-        startEngine()
+        runner.current.enabled = true;
+        startEngine();
       }
-    }, [updateElements, debug, autoStart, gravity, grabCursor, addTopWall]) // 修正依賴項
+    }, [updateElements, debug, autoStart, gravity, grabCursor, addTopWall]); // 修正依賴項
     const clearRenderer = useCallback(() => {
       if (frameId.current) {
-        cancelAnimationFrame(frameId.current)
+        cancelAnimationFrame(frameId.current);
       }
 
       if (mouseConstraint.current) {
-        World.remove(engine.current.world, mouseConstraint.current)
+        World.remove(engine.current.world, mouseConstraint.current);
       }
 
       if (render.current) {
-        Mouse.clearSourceEvents(render.current.mouse)
-        Render.stop(render.current)
-        render.current.canvas.remove()
+        Mouse.clearSourceEvents(render.current.mouse);
+        Render.stop(render.current);
+        render.current.canvas.remove();
       }
 
       if (runner.current) {
-        Runner.stop(runner.current)
+        Runner.stop(runner.current);
       }
 
       if (engine.current) {
-        World.clear(engine.current.world, false)
-        Engine.clear(engine.current)
+        World.clear(engine.current.world, false);
+        Engine.clear(engine.current);
       }
 
-      bodiesMap.current.clear()
-    }, [])
+      bodiesMap.current.clear();
+    }, []);
 
     const handleResize = useCallback(() => {
-      if (!canvas.current || !resetOnResize) return
+      if (!canvas.current || !resetOnResize) return;
 
-      const newWidth = canvas.current.offsetWidth
-      const newHeight = canvas.current.offsetHeight
+      const newWidth = canvas.current.offsetWidth;
+      const newHeight = canvas.current.offsetHeight;
 
-      setCanvasSize({ width: newWidth, height: newHeight })
+      setCanvasSize({ width: newWidth, height: newHeight });
 
       // Clear and reinitialize
-      clearRenderer()
-      initializeRenderer()
-    }, [clearRenderer, initializeRenderer, resetOnResize])
+      clearRenderer();
+      initializeRenderer();
+    }, [clearRenderer, initializeRenderer, resetOnResize]);
 
     const startEngine = useCallback(() => {
       if (runner.current) {
-        runner.current.enabled = true
+        runner.current.enabled = true;
 
-        Runner.run(runner.current, engine.current)
+        Runner.run(runner.current, engine.current);
       }
       if (render.current) {
-        Render.run(render.current)
+        Render.run(render.current);
       }
-      frameId.current = requestAnimationFrame(updateElements)
-      isRunning.current = true
-    }, [updateElements, canvasSize])
+      frameId.current = requestAnimationFrame(updateElements);
+      isRunning.current = true;
+    }, [updateElements, canvasSize]);
 
     const stopEngine = useCallback(() => {
-      if (!isRunning.current) return
+      if (!isRunning.current) return;
 
       if (runner.current) {
-        Runner.stop(runner.current)
+        Runner.stop(runner.current);
       }
       if (render.current) {
-        Render.stop(render.current)
+        Render.stop(render.current);
       }
       if (frameId.current) {
-        cancelAnimationFrame(frameId.current)
+        cancelAnimationFrame(frameId.current);
       }
-      isRunning.current = false
-    }, [])
+      isRunning.current = false;
+    }, []);
 
     const reset = useCallback(() => {
-      stopEngine()
+      stopEngine();
       bodiesMap.current.forEach(({ element, body, props }) => {
-        body.angle = props.angle || 0
+        body.angle = props.angle || 0;
 
-        const x = calculatePosition(props.x, canvasSize.width, element.offsetWidth)
-        const y = calculatePosition(props.y, canvasSize.height, element.offsetHeight)
+        const x = calculatePosition(
+          props.x,
+          canvasSize.width,
+          element.offsetWidth,
+        );
+        const y = calculatePosition(
+          props.y,
+          canvasSize.height,
+          element.offsetHeight,
+        );
 
-        body.position.x = x
-        body.position.y = y
-      })
-      updateElements()
-      handleResize()
-    }, [])
+        body.position.x = x;
+        body.position.y = y;
+      });
+      updateElements();
+      handleResize();
+    }, []);
 
     useImperativeHandle(
       ref,
@@ -412,39 +460,59 @@ const Gravity = forwardRef<GravityRef, GravityProps>(
         stop: stopEngine,
         reset,
       }),
-      [startEngine, stopEngine]
-    )
+      [startEngine, stopEngine],
+    );
 
     useEffect(() => {
-      if (!resetOnResize) return
+      if (!resetOnResize) return;
 
-      const debouncedResize = debounce(handleResize, 500)
-      window.addEventListener('resize', debouncedResize)
+      const debouncedResize = debounce(handleResize, 500);
+      window.addEventListener("resize", debouncedResize);
 
       return () => {
-        window.removeEventListener('resize', debouncedResize)
-        debouncedResize.cancel()
-      }
-    }, [handleResize, resetOnResize])
+        window.removeEventListener("resize", debouncedResize);
+        debouncedResize.cancel();
+      };
+    }, [handleResize, resetOnResize]);
 
     useEffect(() => {
-      initializeRenderer()
-      return clearRenderer
-    }, [initializeRenderer, clearRenderer])
+      let initialized = false;
+
+      const tryInit = () => {
+        if (!canvas.current || initialized) return;
+        const { offsetWidth, offsetHeight } = canvas.current;
+        if (offsetWidth === 0 || offsetHeight === 0) return;
+        initialized = true;
+        initializeRenderer();
+      };
+
+      tryInit();
+
+      const observer = new ResizeObserver(tryInit);
+      if (canvas.current) observer.observe(canvas.current);
+
+      return () => {
+        observer.disconnect();
+        clearRenderer();
+      };
+    }, [initializeRenderer, clearRenderer]);
 
     return (
       <GravityContext.Provider value={{ registerElement, unregisterElement }}>
         <div
           ref={canvas}
-          className={cn(className, 'absolute top-0 left-0 w-full h-full')}
+          className={cn(
+            className,
+            "absolute top-0 left-0 w-full h-full overflow-hidden",
+          )}
           {...props}
         >
           {children}
         </div>
       </GravityContext.Provider>
-    )
-  }
-)
+    );
+  },
+);
 
-Gravity.displayName = 'Gravity'
-export default Gravity
+Gravity.displayName = "Gravity";
+export default Gravity;

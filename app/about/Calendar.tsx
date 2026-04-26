@@ -1,49 +1,55 @@
-'use client'
+"use client";
 
-import { cn } from '@/lib/utils'
-import { motion } from 'motion/react'
-import { useState } from 'react'
+import { motion } from "motion/react";
+import { useState } from "react";
+import { cn } from "@/lib/utils";
 
-import { CalendarSkeleton } from './Skeleton'
-import useContributions from './useContributions'
+import { CalendarSkeleton } from "./Skeleton";
+import useContributions from "./useContributions";
+
 type selectContributionType = {
-  count: number | null
-  date: string | null
-}
+  count: number | null;
+  date: string | null;
+};
 
 const Calendar = () => {
-  const { data, isLoading } = useContributions()
+  const { data, isLoading } = useContributions();
 
-  const [selectContribution, setSelectContribution] = useState<selectContributionType>({
-    count: null,
-    date: null,
-  })
+  const [selectContribution, setSelectContribution] =
+    useState<selectContributionType>({
+      count: null,
+      date: null,
+    });
 
   if (isLoading) {
-    return <CalendarSkeleton />
+    return <CalendarSkeleton />;
   }
 
-  const contributionCalendar = data?.contributionsCollection?.contributionCalendar
-  const colors = contributionCalendar?.colors
-  const weeks = contributionCalendar?.weeks
-  const months = contributionCalendar?.months
+  const contributionCalendar =
+    data?.contributionsCollection?.contributionCalendar;
+  const colors = contributionCalendar?.colors;
+  const weeks = contributionCalendar?.weeks;
+  const _months = contributionCalendar?.months;
 
   const handleSelectContribution = (data: selectContributionType) => {
-    const { count, date } = data
-    setSelectContribution({ count, date })
-  }
+    const { count, date } = data;
+    setSelectContribution({ count, date });
+  };
 
   return (
-    <>
-      <div className='relative flex flex-col gap-[2px] w-full'>
-        <div className='flex justify-start gap-[3px] overflow-hidden'>
+    <div className="py-4">
+      <div className="relative flex flex-col gap-[2px] w-full">
+        <div className="flex justify-start gap-[3px] overflow-hidden">
           {weeks?.map((week) => (
             <div key={week.firstDay}>
               {week.contributionDays.map((contribution) => {
                 const backgroundColor =
-                  contribution.contributionCount > 0 ? (contribution?.color as string) : ''
+                  contribution.contributionCount > 0
+                    ? (contribution?.color as string)
+                    : "";
 
-                const getRandomDelayAnimate = Math.random() * week.contributionDays.length * 0.15
+                const getRandomDelayAnimate =
+                  Math.random() * week.contributionDays.length * 0.15;
 
                 return (
                   <motion.span
@@ -55,7 +61,7 @@ const Calendar = () => {
                       transition: { delay: getRandomDelayAnimate },
                     }}
                     style={{ backgroundColor }}
-                    className='my-[2px] block h-[10px] w-[10px] rounded-xs bg-zinc-300 dark:bg-zinc-800'
+                    className="my-[2px] block h-[10px] w-[10px] rounded-xs bg-zinc-300 dark:bg-zinc-800"
                     onMouseEnter={() =>
                       handleSelectContribution({
                         count: contribution.contributionCount,
@@ -69,18 +75,18 @@ const Calendar = () => {
                       })
                     }
                   />
-                )
+                );
               })}
             </div>
           ))}
         </div>
       </div>
 
-      <div className='flex flex-wrap items-center justify-between gap-2'>
-        <div className='flex items-center gap-2 text-sm'>
-          <span className='dark:text-zinc-400'>Less</span>
-          <ul className='flex gap-1 pl-0'>
-            <motion.li className='h-[10px] w-[10px] rounded-xs bg-zinc-300 dark:bg-zinc-800 list-none' />
+      <div className="flex flex-wrap items-center justify-between gap-2">
+        <div className="flex items-center gap-2 text-sm">
+          <span className="dark:text-zinc-400">Less</span>
+          <ul className="flex gap-1 pl-0">
+            <motion.li className="h-[10px] w-[10px] rounded-xs bg-zinc-300 dark:bg-zinc-800 list-none" />
             {colors?.map((color, colorIndex) => (
               <motion.li
                 key={color}
@@ -90,7 +96,7 @@ const Calendar = () => {
                   transition: { delay: colorIndex * 0.3 },
                   backgroundColor: color,
                 }}
-                className='h-[10px] w-[10px] rounded-xs list-none'
+                className="h-[10px] w-[10px] rounded-xs list-none"
               />
             ))}
           </ul>
@@ -99,15 +105,15 @@ const Calendar = () => {
 
         <div
           className={cn(
-            selectContribution.date ? 'opacity-100' : 'opacity-0',
-            'rounded-sm bg-zinc-200 px-2 text-sm dark:bg-zinc-800'
+            selectContribution.date ? "opacity-100" : "opacity-0",
+            "rounded-sm bg-zinc-200 px-2 text-sm dark:bg-zinc-800",
           )}
         >
           {selectContribution.count} contributions on {selectContribution.date}
         </div>
       </div>
-    </>
-  )
-}
+    </div>
+  );
+};
 
-export default Calendar
+export default Calendar;
