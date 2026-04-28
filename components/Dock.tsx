@@ -154,7 +154,10 @@ function DockItem({ children, className, onClick }: DockItemProps) {
       onClick={onClick}
       whileTap={{ scale: 0.82 }}
       transition={{ type: 'spring', stiffness: 400, damping: 20 }}
-      className={cn('relative inline-flex items-center justify-center cursor-pointer select-none', className)}
+      className={cn(
+        'relative inline-flex items-center justify-center cursor-pointer select-none',
+        className
+      )}
       tabIndex={0}
       role='button'
       aria-haspopup='true'

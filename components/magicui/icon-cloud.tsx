@@ -221,7 +221,8 @@ export function IconCloud({ icons, images }: IconCloudProps) {
       const dx = mousePos.x - centerX
       const dy = mousePos.y - centerY
       const distance = Math.sqrt(dx * dx + dy * dy)
-      const speed = 0.003 + (distance / maxDistance) * 0.01
+      // 提升基礎轉速從 0.003 -> 0.008，提升感應轉速從 0.01 -> 0.02
+      const speed = 0.008 + (distance / maxDistance) * 0.02
 
       if (targetRotation) {
         const elapsed = performance.now() - targetRotation.startTime
@@ -302,7 +303,7 @@ export function IconCloud({ icons, images }: IconCloudProps) {
       onMouseMove={handleMouseMove}
       onMouseUp={handleMouseUp}
       onMouseLeave={handleMouseUp}
-      className='rounded-lg'
+      className='rounded-lg w-full h-auto max-w-[400px]'
       aria-label='Interactive 3D Icon Cloud'
       role='img'
     />

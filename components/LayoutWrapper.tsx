@@ -1,29 +1,25 @@
-import { Inter } from "next/font/google";
-import type { ReactNode } from "react";
-import Footer from "./Footer";
-import Header from "./Header";
-import SectionContainer from "./SectionContainer";
+import { Inter } from 'next/font/google'
+import type { ReactNode } from 'react'
+import Header from './Header'
+import SectionContainer from './SectionContainer'
 
 interface Props {
-  children: ReactNode;
+  children: ReactNode
 }
 
 const inter = Inter({
-  subsets: ["latin"],
-});
+  subsets: ['latin'],
+})
 
 const LayoutWrapper = ({ children }: Props) => {
   return (
     <SectionContainer>
-      <div
-        className={`${inter.className} flex h-screen flex-col justify-between font-sans`}
-      >
+      <div className={`${inter.className} flex h-screen flex-col justify-between font-sans`}>
         <Header />
-        <main className="mb-auto pt-14">{children}</main>
-        <Footer />
+        <main className='mb-auto pt-14'>{children}</main>
       </div>
     </SectionContainer>
-  );
-};
+  )
+}
 
-export default LayoutWrapper;
+export default LayoutWrapper

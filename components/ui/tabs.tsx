@@ -40,12 +40,13 @@ export const Tabs = ({
     <>
       <div
         className={cn(
-          'flex flex-row items-center justify-start [perspective:1000px] relative overflow-auto sm:overflow-visible no-visible-scrollbar max-w-full w-full',
+          'flex flex-row items-center justify-start [perspective:1000px] relative overflow-auto sm:overflow-visible no-scrollbar max-w-full w-full',
           containerClassName
         )}
       >
         {propTabs.map((tab, idx) => (
           <button
+            type='button'
             key={tab.title}
             onClick={() => {
               moveSelectedTabToTop(idx)

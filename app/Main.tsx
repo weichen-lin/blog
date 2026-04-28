@@ -8,10 +8,10 @@ import { BackgroundBeamsWithCollision } from '@/components/ui/background-beams-w
 
 export default function Home() {
   return (
-    <BackgroundBeamsWithCollision className='flex-col justify-between pt-14'>
+    <BackgroundBeamsWithCollision className='flex-col justify-center pt-14 h-[calc(100vh-3.5rem)]'>
       <Header />
-      <div className='flex-1 flex flex-col gap-y-6 items-start w-full justify-between mx-auto max-w-3xl px-4 sm:px-6 xl:max-w-5xl xl:px-0 bg-transparent'>
-        <div className='relative w-full h-[200px] road'>
+      <div className='flex-1 flex flex-col gap-y-24 items-start w-full justify-center mx-auto max-w-3xl px-4 sm:px-6 xl:max-w-5xl xl:px-0 bg-transparent'>
+        <div className='relative w-full h-[200px] road '>
           <div className='absolute top-[10%] left-[10%] w-full h-full'>
             <PoliceCar />
           </div>
@@ -43,7 +43,14 @@ export default function Home() {
           <BoxReveal boxColor={'#a6a2eb'} duration={0.5}>
             <div className='flex items-center gap-x-4'>
               <h2 className='text-[1rem]'>Currently working at</h2>
-              <Image src='/static/images/ikg.svg' width={100} height={50} alt='IKG' />
+              <Image
+                src='/static/images/ikg.svg'
+                width={100}
+                height={50}
+                alt='IKG'
+                priority
+                style={{ height: 'auto' }}
+              />
             </div>
           </BoxReveal>
         </div>
