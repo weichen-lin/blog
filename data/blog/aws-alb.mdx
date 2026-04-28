@@ -1,0 +1,155 @@
+---
+title: 🚨 為什麼 ECS + ALB 會吐出 502？
+date: "2026-04-28"
+tags: ["aws", "alb", "ecs", "node.js", "backend development", "networking"]
+draft: false
+summary: 大多數 ALB 502 錯誤其實跟你的應用程式邏輯無關，根源是連線管理的超時設定沒對齊。本文拆解 ALB idle timeout 與後端 Keep-Alive 的關係，說明為何 65 秒是個合理的數字。
+---
+
+最近在處理 ECS 服務偶發 502 的問題，查了一圈發現這類錯誤大多不是應用程式的 bug，而是 **ALB 與後端之間的連線超時沒有對齊**造成的。
+
+釐清之後覺得這個眉角蠻值得記錄一下，因為設定看起來很簡單，但背後的競態條件（race condition）其實有點微妙。
+
+> 💡 **TL;DR**
+>
+> - 大多數 ALB 502 是連線管理問題，不是應用程式邏輯問題。
+> - 後端的 Keep-Alive 超時要**大於** ALB 的 idle timeout。
+> - 常見安全設定：ALB 60 秒，後端 65 秒（多 5～10 秒）。
+
+---
+
+### ALB 在 ECS 裡面扮演什麼角色？
+
+在 ECS 架構裡，ALB（Application Load Balancer）負責：
+
+- 接收外部流量
+- 依照規則（Host / Path / Header 等）路由到對應的 Target Group
+- 把請求分配給健康的 ECS Task
+- 透過 Health Check 排除不健康的 Task
+
+簡單說就是**流量入口 + 路由器 + 健康過濾器**三合一。
+
+---
+
+### 連線是什麼？
+
+#### TCP 連線的本質
+
+一條連線就是透過三向握手（SYN → SYN-ACK → ACK）建立的 TCP 通道。建立之後：
+
+- 雙向傳輸資料
+- 連線是有狀態的（stateful）
+- 會佔用系統資源（socket、file descriptor、記憶體、port）
+
+#### HTTP 與 Keep-Alive
+
+HTTP 請求跑在 TCP 連線上。開啟 Keep-Alive 之後，請求完成的連線**不會馬上關掉**，而是留著等下一次請求重用。
+
+這樣的好處是省掉每次都要重新握手的開銷，降低延遲和 CPU 使用。
+
+---
+
+### 為什麼會出現 502？（Race Condition）
+
+典型情境是這樣：
+
+1. ALB 和後端之間有一條 Keep-Alive 的閒置連線。
+2. 後端覺得閒太久了，**主動關掉**這條連線（送出 FIN）。
+3. ALB 還沒來得及收到 FIN，就把新的請求送進這條連線。
+4. 送出去之後才發現連線已經壞了，只好回傳 **502** 給客戶端。
+
+> ⚠️ **重點**：這個 502 是 ALB 吐的，不是你的服務主動回的。所以你在 application log 裡不會看到任何錯誤，但客戶端收到的就是 502。
+
+---
+
+### `idle_timeout` vs. `client_keep_alive`，這兩個常被搞混
+
+#### `idle_timeout.timeout_seconds`
+
+連線**完全閒置**多久後關閉。只要有任何資料傳輸就會重置計時器。預設通常是 60 秒。
+
+一句話：「閒太久就關掉。」
+
+#### `client_keep_alive.seconds`
+
+連線的**總存活時間**，不管有沒有在用，到了就關。預設通常是 3600 秒（1 小時）。
+
+一句話：「活太久就關掉。」
+
+---
+
+### 為什麼後端設 65 秒是合理的？
+
+| 設定                    | 值               |
+| ----------------------- | ---------------- |
+| ALB idle timeout        | 60 秒（預設）    |
+| 後端 Keep-Alive timeout | 65 秒（多 5 秒） |
+
+目標是讓 **ALB 比後端先關掉連線**。
+
+如果後端先關，ALB 可能在收到 FIN 之前就把新請求送進去，就會觸發上面說的 race condition。後端超時比 ALB 多個 5～10 秒，就能有效避免這個問題。
+
+Node.js 的話，對應設定是：
+
+```javascript
+server.keepAliveTimeout = 65000; // 毫秒
+server.headersTimeout = 66000; // 要比 keepAliveTimeout 稍微大一點
+```
+
+---
+
+### 請求結束後連線會馬上釋放嗎？
+
+**不一定**，取決於有沒有用 Keep-Alive。
+
+- **有 Keep-Alive**：請求完成後連線變成閒置狀態，不會馬上釋放，等超時或主動關閉才釋放。
+- **沒有 Keep-Alive** 或帶 `Connection: close`：請求完成後連線立刻關閉，資源釋放。
+- 主動送出 FIN / RST 也會釋放。
+
+---
+
+### 伺服器端能處理 ALB 吐的 502 嗎？
+
+**不能直接處理**，因為 502 是 ALB 在連線層回的，不會進到你的應用程式。
+
+但可以**降低發生機率**：
+
+**伺服器端：**
+
+- 超時設定對齊（後端 timeout > ALB timeout）
+- Graceful shutdown：先停止接新請求，再把現有請求處理完
+- 調整 Health Check 和部署流程，避免流量中斷
+
+**客戶端：**
+
+- 條件式 retry
+- Circuit breaker
+
+這些只是緩解症狀，真正的根本解是把超時對齊。
+
+---
+
+### AWS 官方怎麼說？
+
+> "Configure the idle timeout of your application to be larger than the idle timeout configured for the load balancer. Otherwise… the load balancer might send a request to the application before it receives the packet indicating that the connection is closed."
+> — AWS 官方文件
+
+這句話就是「後端 timeout > ALB timeout」這個規則的出處。
+
+---
+
+### 參考資料
+
+**AWS 官方**
+
+- [Edit ALB Attributes — idle_timeout & client_keep_alive](https://docs.aws.amazon.com/elasticloadbalancing/latest/application/edit-load-balancer-attributes.html)
+- [ALB Troubleshooting — HTTP 502](https://docs.aws.amazon.com/elasticloadbalancing/latest/application/load-balancer-troubleshooting.html)
+- [Troubleshoot ALB HTTP 502 Errors（re:Post KB）](https://www.repost.aws/knowledge-center/elb-alb-troubleshoot-502-errors)
+- [ALB HTTP Client Keepalive Duration Announcement（2024/03）](https://aws.amazon.com/about-aws/whats-new/2024/03/application-load-balancer-http-keepalive-duration/)
+
+**社群 / 實戰案例**
+
+- [AWS ELB 5xxs: Revisit your server.keepAliveTimeout — Node.js 範例](https://medium.com/@_alif/aws-elb-5xxs-revisit-your-server-keepalivetimeout-a0ea8e22c242)
+- [AWS ECS 502 errors using ALB and Node.js](https://medium.com/@steadweb/aws-ecs-502-errors-using-alb-and-nodejs-891c55e9f573)
+- [502 errors with ALB Idle Timeout / Apache Keep-Alive（re:Post 討論）](https://repost.aws/questions/QUqP4BHC9iQ0uIB69M7QrjSg/502-errors-with-application-load-balancer-idle-timeout-apache2-keep-alive-timeout)
+- [ALB Connection Handling Deep Dive](https://www.ultimatenetworkwarrior.com/blog/alb-connection-handling)
